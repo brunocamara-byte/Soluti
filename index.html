@@ -453,6 +453,42 @@
         tr.srch-match td { color: #e5e7eb; }
         mark { background: rgba(0,177,64,.25); color: #4ADE80; border-radius: 2px; padding: 0 2px; }
 
+        
+        /* ── RESPONSIVIDADE ── */
+        @media (max-width: 1200px) {
+            .kanban { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (max-width: 900px) {
+            .kanban { grid-template-columns: repeat(2, 1fr) !important; }
+            .filters { grid-template-columns: 1fr 1fr !important; }
+            .kpis { grid-template-columns: repeat(2, 1fr) !important; }
+            header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .header-right { width: 100%; justify-content: space-between; }
+        }
+        @media (max-width: 600px) {
+            body { padding: 10px !important; }
+            .container { padding: 0 !important; }
+            header { padding: 14px !important; }
+            header h1 { font-size: 18px !important; }
+            .filters { grid-template-columns: 1fr !important; padding: 12px !important; gap: 10px !important; }
+            .search-group { grid-column: 1 / -1; }
+            .search-wrap input { width: 100% !important; }
+            .kpis { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+            .kpi-card { padding: 14px !important; }
+            .kpi-value { font-size: 28px !important; }
+            .kanban { grid-template-columns: 1fr !important; gap: 12px !important; }
+            .nav-tabs { overflow-x: auto; white-space: nowrap; }
+            .nav-tab { padding: 10px 14px !important; font-size: 12px !important; }
+            table { font-size: 11px !important; }
+            th, td { padding: 7px 8px !important; }
+            .faturamento-summary { grid-template-columns: 1fr 1fr !important; }
+            .btn-refresh span:last-child { display: none; }
+        }
+        @media (max-width: 400px) {
+            .kpis { grid-template-columns: 1fr !important; }
+            .faturamento-summary { grid-template-columns: 1fr !important; }
+        }
+
         </style>
 </head>
 <body>
@@ -480,7 +516,7 @@
         <div class="filters">
             <div class="filter-group">
                 <label>📅 Ano</label>
-                <select onchange="updateDashboard()">
+                <select id="f-ano" onchange="updateDashboard()">
                     <option value="all" selected>Todos</option>
                     <option value="2026">2026</option>
                     <option value="2025">2025</option>
@@ -489,16 +525,20 @@
             </div>
             <div class="filter-group">
                 <label>🏢 Projeto</label>
-                <select onchange="updateDashboard()">
+                <select id="f-proj" onchange="updateDashboard()">
                     <option value="all" selected>Todos</option>
-                    <option value="ecommerce">Ecommerce</option>
-                    <option value="sales">Sales Ops</option>
-                    <option value="geral">Geral - Soluti</option>
+                    <option value="Ecommerce">Ecommerce</option>
+                    <option value="Geral - Soluti">Geral - Soluti</option>
+                    <option value="V.D.">V.D.</option>
+                    <option value="SolutiPRO">SolutiPRO</option>
+                    <option value="Sales Ops">Sales Ops</option>
+                    <option value="Licitação">Licitação</option>
                 </select>
             </div>
             <div class="filter-group">
                 <label>📆 Mês</label>
-                <select onchange="updateDashboard()">
+                <select id="f-mes" onchange="updateDashboard()">
+                    <option value="all">Todos</option>
                     <option value="1">Janeiro</option>
                     <option value="2">Fevereiro</option>
                     <option value="3" selected>Março</option>
@@ -948,10 +988,9 @@
         }
 
         function updateDashboard() {
-            const sels = document.querySelectorAll('.filters select');
-            activeAno  = sels[0] ? sels[0].value : 'all';
-            activeProj = sels[1] ? sels[1].value : 'all';
-            activeMes  = sels[2] ? sels[2].value : 'all';
+            activeAno  = document.getElementById('f-ano')  ? document.getElementById('f-ano').value  : 'all';
+            activeProj = document.getElementById('f-proj') ? document.getElementById('f-proj').value : 'all';
+            activeMes  = document.getElementById('f-mes')  ? document.getElementById('f-mes').value  : 'all';
             applyFilters();
         }
 
