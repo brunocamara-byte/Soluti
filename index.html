@@ -278,6 +278,23 @@
         .faturamento-summary { grid-template-columns: repeat(5,1fr) !important; }
         #faturamento .tbl-wrap, #pipeline .tbl-wrap { overflow-x: auto; }
 
+
+        /* ── KANBAN CARD COLORS POR ESTÁGIO ── */
+        .kanban-column.backlog    .card { border-left: 3px solid #94A3B8; background: rgba(148,163,184,0.04); }
+        .kanban-column.analise-tec .card { border-left: 3px solid var(--blue); background: rgba(46,144,250,0.04); }
+        .kanban-column.ag-aprovacao .card { border-left: 3px solid var(--yellow); background: rgba(247,144,9,0.04); }
+        .kanban-column.execucao    .card { border-left: 3px solid #7C3AED; background: rgba(124,58,237,0.04); }
+        .kanban-column.bloqueada   .card { border-left: 3px solid var(--red); background: rgba(240,68,56,0.04); }
+        .kanban-column.concluida   .card { border-left: 3px solid var(--green); background: rgba(18,183,106,0.04); }
+
+        /* Card ID color por estágio */
+        .kanban-column.backlog     .card-id { color: #94A3B8; }
+        .kanban-column.analise-tec .card-id { color: var(--blue); }
+        .kanban-column.ag-aprovacao .card-id { color: var(--yellow-d); }
+        .kanban-column.execucao    .card-id { color: #7C3AED; }
+        .kanban-column.bloqueada   .card-id { color: var(--red); }
+        .kanban-column.concluida   .card-id { color: var(--green); }
+
         /* ── RESPONSIVE ── */
         @media (max-width: 1100px) {
             .kanban { grid-template-columns: repeat(3, 1fr); }
