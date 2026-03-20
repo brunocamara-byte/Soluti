@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soluti × Gestão Online — Portal de Demandas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0A2E14 0%, #0f172a 100%);
+            color: #e5e7eb;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(10, 46, 20, 0.85);
+            border-radius: 8px;
+            border-left: 4px solid #00B140;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-refresh {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(0, 177, 64, 0.1);
+            border: 1px solid #00B140;
+            border-radius: 6px;
+            color: #00B140;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-refresh:hover {
+            background: rgba(0, 177, 64, 0.2);
+            transform: scale(1.05);
+        }
+
+        .btn-refresh:active {
+            animation: spin 0.5s ease-in-out;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .refresh-icon {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+        }
+
+        .last-update {
+            font-size: 11px;
+            color: #6b7280;
+            text-align: right;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(130px, 1fr)) 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(10, 46, 20, 0.55);
+            border-radius: 8px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        select {
+            padding: 10px 12px;
+            background: rgba(31, 41, 55, 0.8);
+            border: 1px solid #1A3A22;
+            border-radius: 6px;
+            color: #e5e7eb;
+            font-size: 13px;
+        }
+
+        select:hover {
+            border-color: #00B140;
+        }
+
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(130px, 1fr)) 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: rgba(10, 46, 20, 0.65);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #00B140;
+        }
+
+        .kpi-card.success { border-left-color: #00B140; }
+        .kpi-card.warning { border-left-color: #f59e0b; }
+        .kpi-card.danger { border-left-color: #ef4444; }
+        .kpi-card.info { border-left-color: #00B140; }
+
+        .kpi-label {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #1A3A22;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tab.active { color: #00B140; border-bottom-color: #00B140; }
+
+        .nav-tab:hover {
+            color: #e5e7eb;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .kanban {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kanban-column {
+            background: rgba(10, 46, 20, 0.55);
+            border-radius: 8px;
+            padding: 15px;
+            border-top: 3px solid #00B140;
+            min-height: 400px;
+        }
+
+        .kanban-column h3 {
+            font-size: 13px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .kanban-column .count {
+            background: rgba(0, 177, 64, 0.2);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .kanban-column.analise-tec { border-top-color: #00B140; }
+        .kanban-column.aprovacao { border-top-color: #f59e0b; }
+        .kanban-column.aguardando { border-top-color: #f59e0b; }
+        .kanban-column.execucao { border-top-color: #fbbf24; }
+        .kanban-column.bloqueada { border-top-color: #ef4444; }
+        .kanban-column.concluida { border-top-color: #00B140; }
+
+        .card {
+            background: rgba(31, 41, 55, 0.8);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 3px solid #00B140;
+            font-size: 12px;
+        }
+
+        .card-id {
+            color: #00B140;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .card-title {
+            color: #e5e7eb;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .card-project {
+            font-size: 10px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .badge-alta { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+        .badge-media { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+        .badge-baixa { background: rgba(0, 177, 64, 0.2); color: #4ADE80; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 13px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #1A3A22;
+        }
+
+        th {
+            background: rgba(10, 46, 20, 0.85);
+            color: #e5e7eb;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        td {
+            color: #d1d5db;
+        }
+
+        tr:hover {
+            background: rgba(10, 46, 20, 0.35);
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: #e5e7eb;
+            margin: 20px 0 15px 0;
+            font-weight: 600;
+        }
+
+        .faturamento-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: rgba(10, 46, 20, 0.65);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #00B140;
+        }
+
+        .summary-card .label {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 5px;
+        }
+
+        .summary-card .value {
+            font-size: 20px;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            background: rgba(10, 46, 20, 0.65);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            position: relative;
+            height: 300px;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(10, 46, 20, 0.45);
+            border-left: 3px solid #00B140;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #d1d5db;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+            font-size: 11px;
+        }
+
+        @media (max-width: 1024px) {
+            .kanban {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kanban {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filters {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .kpis {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .kanban {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .kpis {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-left h1 {
+                font-size: 20px;
+            }
+
+            .header-right {
+                flex-direction: column;
+            }
+        }
+    
+        /* ── BUSCA ── */
+        .search-group { display: flex; flex-direction: column; }
+        .search-wrap { position: relative; }
+        .search-wrap input {
+            width: 100%;
+            padding: 10px 34px 10px 34px;
+            background: rgba(31, 41, 55, 0.8);
+            border: 1px solid #1A3A22;
+            border-radius: 6px;
+            color: #e5e7eb;
+            font-size: 13px;
+            transition: border-color .2s;
+        }
+        .search-wrap input::placeholder { color: #4b5563; }
+        .search-wrap input:focus { border-color: #00B140; outline: none; box-shadow: 0 0 0 2px rgba(0,177,64,.15); }
+        .search-wrap .search-ico {
+            position: absolute; left: 11px; top: 50%;
+            transform: translateY(-50%); color: #4b5563;
+            font-size: 14px; pointer-events: none;
+        }
+        .search-wrap .search-clr {
+            position: absolute; right: 10px; top: 50%;
+            transform: translateY(-50%); background: none;
+            border: none; color: #4b5563; cursor: pointer;
+            font-size: 14px; display: none; padding: 2px;
+        }
+        .search-wrap .search-clr:hover { color: #9ca3af; }
+        .search-result-info {
+            font-size: 12px; color: #9ca3af;
+            margin-bottom: 10px; min-height: 18px;
+        }
+        .search-result-info .srch-count { color: #00B140; font-weight: 600; }
+        tr.srch-match { background: rgba(59,130,246,.07) !important; }
+        tr.srch-match td { color: #e5e7eb; }
+        mark { background: rgba(0,177,64,.25); color: #4ADE80; border-radius: 2px; padding: 0 2px; }
+
+        </style>
+</head>
+<body>
+    
+<div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+  <div style="width:40px;height:40px;border:3px solid rgba(0,177,64,.2);border-top-color:#00B140;border-radius:50%;animation:spin 1s linear infinite"></div>
+  <div style="color:#e5e7eb;font-size:13px;font-family:sans-serif">Carregando dados…</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+    <div class="container">
+        <header>
+            <div class="header-left">
+                <h1>📊 Dashboard Soluti - Demandas</h1>
+                <p>Acompanhamento de horas e demandas</p>
+            </div>
+            <div class="header-right">
+                <button class="btn-refresh" onclick="forceRefresh()">
+                    <span class="refresh-icon">🔄</span>
+                    <span>Sincronizar</span>
+                </button>
+                <div class="last-update">
+                    <div id="lastUpdate">Última atualização</div>
+                    <div id="updateTime">19 mar, 17:32</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>📅 Ano</label>
+                <select onchange="updateDashboard()">
+                    <option value="all" selected>Todos</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>🏢 Projeto</label>
+                <select onchange="updateDashboard()">
+                    <option value="all" selected>Todos</option>
+                    <option value="ecommerce">Ecommerce</option>
+                    <option value="sales">Sales Ops</option>
+                    <option value="geral">Geral - Soluti</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>📆 Mês</label>
+                <select onchange="updateDashboard()">
+                    <option value="1">Janeiro</option>
+                    <option value="2">Fevereiro</option>
+                    <option value="3" selected>Março</option>
+                </select>
+            </div>
+
+            <div class="search-group">
+                <label>🔍 Buscar chamado ou assunto</label>
+                <div class="search-wrap">
+                    <span class="search-ico">🔍</span>
+                    <input type="text" id="search-input" placeholder="Ex: #8160 ou checkout ou Digisac…" oninput="onSearch(this)">
+                    <button class="search-clr" id="search-clr" onclick="clearSearch()">✕</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="kpis">
+            <div class="kpi-card info">
+                <div class="kpi-label">Total Demandas</div>
+                <div class="kpi-value">16</div>
+            </div>
+            <div class="kpi-card success">
+                <div class="kpi-label">Concluídas</div>
+                <div class="kpi-value">10</div>
+            </div>
+            <div class="kpi-card warning">
+                <div class="kpi-label">Em Execução</div>
+                <div class="kpi-value">3</div>
+            </div>
+            <div class="kpi-card danger">
+                <div class="kpi-label">Bloqueadas</div>
+                <div class="kpi-value">1</div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('kanban', this)">📋 Kanban</button>
+            <button class="nav-tab" onclick="switchTab('pipeline', this)">📊 Pipeline</button>
+            <button class="nav-tab" onclick="switchTab('relatorio', this)">📈 Relatórios</button>
+            <button class="nav-tab" onclick="switchTab('faturamento', this)">💰 Faturamento</button>
+        </div>
+
+        <!-- KANBAN -->
+        <div id="kanban" class="tab-content active">
+            <div class="kanban">
+                <div class="kanban-column">
+                    <h3>Backlog <span class="count">2</span></h3>
+                    <div class="card">
+                        <div class="card-id">#6103</div>
+                        <div class="card-project">Ecommerce</div>
+                        <div class="card-title">Ajuste Integração</div>
+                        <span class="badge badge-media">Média</span>
+                    </div>
+                </div>
+
+                <div class="kanban-column analise-tec">
+                    <h3>Análise Técnica <span class="count">2</span></h3>
+                    <div class="card">
+                        <div class="card-id">#6110</div>
+                        <div class="card-project">Sales Ops</div>
+                        <div class="card-title">Performance Analysis</div>
+                        <span class="badge badge-alta">Alta</span>
+                    </div>
+                </div>
+
+                <div class="kanban-column aprovacao">
+                    <h3>Aprovação <span class="count">1</span></h3>
+                </div>
+
+                <div class="kanban-column aguardando">
+                    <h3>Aguardando Aprovação <span class="count">2</span></h3>
+                    <div class="card">
+                        <div class="card-id">#6115</div>
+                        <div class="card-project">Ecommerce</div>
+                        <div class="card-title">Bot Implementation (20h est)</div>
+                        <span class="badge badge-alta">Alta</span>
+                    </div>
+                </div>
+
+                <div class="kanban-column execucao">
+                    <h3>Execução <span class="count">3</span></h3>
+                    <div class="card">
+                        <div class="card-id">#6120</div>
+                        <div class="card-project">Geral - Soluti</div>
+                        <div class="card-title">Database Migration</div>
+                        <span class="badge badge-media">Média</span>
+                    </div>
+                </div>
+
+                <div class="kanban-column bloqueada">
+                    <h3>Bloqueada <span class="count">1</span></h3>
+                    <div class="card">
+                        <div class="card-id">#6125</div>
+                        <div class="card-project">Sales Ops</div>
+                        <div class="card-title">Aguardando feedback cliente</div>
+                        <span class="badge badge-media">Média</span>
+                    </div>
+                </div>
+
+                <div class="kanban-column concluida">
+                    <h3>Concluída <span class="count">10</span></h3>
+                    <div class="card">
+                        <div class="card-id">#5587</div>
+                        <div class="card-project">Ecommerce</div>
+                        <div class="card-title">Jornada Checkout</div>
+                        <span class="badge badge-alta">Alta</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PIPELINE -->
+        <div id="pipeline" class="tab-content">
+            
+            <div class="search-result-info" id="search-info"></div>
+            <div class="section-title">📊 Pipeline de Demandas - Março 2026</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Assunto</th>
+                        <th>Status</th>
+                        <th>Complexidade</th>
+                        <th>Projeto</th>
+                        <th>Horas Est</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#5587</td>
+                        <td>2026-03-02</td>
+                        <td>Atualização da jornada checkout</td>
+                        <td>Concluída</td>
+                        <td><span class="badge badge-alta">Alta</span></td>
+                        <td>Ecommerce</td>
+                        <td>16h</td>
+                    </tr>
+                    <tr>
+                        <td>#5700</td>
+                        <td>2026-03-03</td>
+                        <td>Ajuste Integração Sankhya</td>
+                        <td>Concluída</td>
+                        <td><span class="badge badge-baixa">Baixa</span></td>
+                        <td>Ecommerce</td>
+                        <td>1h</td>
+                    </tr>
+                    <tr>
+                        <td>#6115</td>
+                        <td>2026-03-15</td>
+                        <td>Implementação Bot Atendimento</td>
+                        <td>Execução</td>
+                        <td><span class="badge badge-alta">Alta</span></td>
+                        <td>Sales Ops</td>
+                        <td>20h</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- RELATÓRIOS -->
+        <div id="relatorio" class="tab-content">
+            <div class="section-title">📈 Relatório Comparativo - Março 2026</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Projeto</th>
+                        <th>Demandas</th>
+                        <th>Horas Est</th>
+                        <th>Concluídas</th>
+                        <th>Em Execução</th>
+                        <th>Bloqueadas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Ecommerce</td>
+                        <td>8</td>
+                        <td>48h</td>
+                        <td>6</td>
+                        <td>2</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>Sales Ops</td>
+                        <td>5</td>
+                        <td>22h</td>
+                        <td>3</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>Geral - Soluti</td>
+                        <td>3</td>
+                        <td>18h</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>0</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="chart-container">
+                <canvas id="chartDemandas"></canvas>
+            </div>
+        </div>
+
+        <!-- FATURAMENTO -->
+        <div id="faturamento" class="tab-content">
+            <div class="section-title">💰 Faturamento - Março 2026</div>
+            
+            <div class="faturamento-summary">
+                <div class="summary-card">
+                    <div class="label">Demandas Recebidas</div>
+                    <div class="value">16</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Franquia (60h)</div>
+                    <div class="value">60h</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Horas Utilizadas</div>
+                    <div class="value">44h</div>
+                </div>
+                <div class="summary-card" style="border-left-color: #00B140;">
+                    <div class="label">Horas Restantes</div>
+                    <div class="value">16h</div>
+                </div>
+            </div>
+
+            <div class="section-title">📋 Tickets Fechados para Faturamento</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data Conclusão</th>
+                        <th>Assunto</th>
+                        <th>Projeto</th>
+                        <th>Horas Est</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#5587</td>
+                        <td>2026-03-02</td>
+                        <td>Atualização jornada checkout</td>
+                        <td>Ecommerce</td>
+                        <td>16h</td>
+                        <td>✅ Faturado</td>
+                    </tr>
+                    <tr>
+                        <td>#5700</td>
+                        <td>2026-03-03</td>
+                        <td>Ajuste Integração Sankhya</td>
+                        <td>Ecommerce</td>
+                        <td>1h</td>
+                        <td>✅ Faturado</td>
+                    </tr>
+                    <tr>
+                        <td>#6103</td>
+                        <td>2026-03-10</td>
+                        <td>Melhoria em Dashboard</td>
+                        <td>Sales Ops</td>
+                        <td>8h</td>
+                        <td>✅ Faturado</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <strong style="color: #e5e7eb;">📌 Observação:</strong><br>
+                As 16 horas restantes não são carregadas para o próximo mês. Em Abril, a franquia renova para 60 horas. As demandas não faturadas em Março serão repriorizadas conforme o novo pipeline de demandas de Abril.
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        📌 Dashboard Soluti • Preview v2 • Atualizado em 19 de março de 2026<br>
+        Este é um preview do dashboard que será publicado no Vercel com autenticação
+    </div>
+
+    
+
+    
+
+
+    <script>
+        // ── CONFIG ────────────────────────────────────────────────────────
+        const PIPELINE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT_cf1JgfP-gPQHy-h9swEqt3QOOGS3OS-5T5gE6TIQONGKUJKzxRESMDrn16EEhzMIzWEyWwDfZvJ-/pub?gid=461656245&single=true&output=csv';
+
+        const STATUS_CLASS = {
+            'Concluída':'s-conc','Execução':'s-exec','Backlog':'s-back',
+            'Bloqueada':'s-bloc','Ag. Aprovação Soluti':'s-agap','Análise Técnica':'s-antec'
+        };
+        const KANBAN_STAGES = [
+            {key:'Backlog',              label:'Backlog',               cls:'backlog'},
+            {key:'Análise Técnica',      label:'Análise Técnica',        cls:'analise-tec'},
+            {key:'Ag. Aprovação Soluti', label:'Ag. Aprovação Soluti',   cls:'ag-aprovacao'},
+            {key:'Execução',             label:'Execução',               cls:'execucao'},
+            {key:'Bloqueada',            label:'Bloqueada',              cls:'bloqueada'},
+            {key:'Concluída',            label:'Concluída',              cls:'concluida'},
+        ];
+
+        let ALL_RECORDS = [];
+        let activeSearch = '';
+        let activeAno  = 'all';
+        let activeProj = 'all';
+        let activeMes  = 'all';
+        let chartRelatorio = null;
+        let isSyncing = false;
+
+        // ── PARSE CSV ─────────────────────────────────────────────────────
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            if (lines.length < 2) return [];
+
+            // Headers: ID,Chamado,Assunto,Data do Ticket,Status,Equipe GO,Projeto,Horas Estimadas,Horas Reais,Data Conclusão
+            const records = [];
+            for (let i = 1; i < lines.length; i++) {
+                const cols = splitCSVLine(lines[i]);
+                if (!cols[0] || cols[0].trim() === '') continue;
+
+                const id       = (cols[0] || '').trim();
+                const chamado  = (cols[1] || '').trim();
+                const assunto  = (cols[2] || '').trim();
+                const data     = parseDate(cols[3]);
+                const status   = (cols[4] || 'Backlog').trim();
+                const equipe   = (cols[5] || '').trim();
+                const projeto  = (cols[6] || '').trim();
+                const hrs_est  = parseFloat(cols[7]) || 0;
+                const hrs_real = parseFloat(cols[8]) || 0;
+                const data_conc = parseDate(cols[9]);
+
+                if (!id.startsWith('SOL-')) continue;
+
+                records.push({ id, chamado, assunto, data, status, equipe, projeto, hrs_est, hrs_real, data_conc });
+            }
+            return records;
+        }
+
+        function splitCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') { inQuotes = !inQuotes; }
+                else if (ch === ',' && !inQuotes) { result.push(current); current = ''; }
+                else { current += ch; }
+            }
+            result.push(current);
+            return result;
+        }
+
+        function parseDate(val) {
+            if (!val || val.trim() === '' || val.trim() === '-') return '';
+            const v = val.trim().replace(/"/g, '');
+            // DD/MM/YYYY
+            const m1 = v.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            if (m1) return `${m1[3]}-${m1[2]}-${m1[1]}`;
+            // YYYY-MM-DD
+            const m2 = v.match(/^\d{4}-\d{2}-\d{2}$/);
+            if (m2) return v;
+            return '';
+        }
+
+        // ── FETCH & SYNC ──────────────────────────────────────────────────
+        async function syncData(showFeedback = true) {
+            if (isSyncing) return;
+            isSyncing = true;
+
+            const btn = document.querySelector('.btn-refresh');
+            const orig = btn ? btn.innerHTML : '';
+            if (btn) btn.innerHTML = '<span>⏳</span><span>Sincronizando…</span>';
+
+            try {
+                // Cache busting
+                const url = PIPELINE_CSV_URL + '&t=' + Date.now();
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const text = await resp.text();
+                ALL_RECORDS = parseCSV(text);
+
+                if (ALL_RECORDS.length === 0) throw new Error('Nenhum registro encontrado');
+
+                setNow('Atualizado agora');
+                applyFilters();
+
+                if (showFeedback && btn) {
+                    btn.innerHTML = '<span>✅</span><span>' + ALL_RECORDS.length + ' registros</span>';
+                    setTimeout(() => { btn.innerHTML = orig; }, 2500);
+                }
+
+            } catch(err) {
+                console.error('Sync error:', err);
+                setNow('Erro na sincronização');
+                if (btn) {
+                    btn.innerHTML = '<span>❌</span><span>Erro — tente novamente</span>';
+                    setTimeout(() => { btn.innerHTML = orig; }, 3000);
+                }
+            } finally {
+                isSyncing = false;
+            }
+        }
+
+        function forceRefresh() { syncData(true); }
+
+        // ── INIT ──────────────────────────────────────────────────────────
+        window.addEventListener('DOMContentLoaded', () => {
+            setNow('Carregando…');
+            syncData(false);
+        });
+
+        function setNow(status) {
+            const now = new Date();
+            const meses = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+            const time = `${now.getDate()} ${meses[now.getMonth()]}, ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            if (document.getElementById('updateTime')) document.getElementById('updateTime').textContent = time;
+            if (document.getElementById('lastUpdate')) document.getElementById('lastUpdate').textContent = status || 'Última atualização';
+        }
+
+        // ── FILTERS ───────────────────────────────────────────────────────
+        function getFiltered() {
+            const s = activeSearch.toLowerCase().trim();
+            return ALL_RECORDS.filter(r => {
+                const d = r.data ? new Date(r.data) : null;
+                const anoOk  = activeAno  === 'all' || (d && d.getFullYear() == activeAno);
+                const projOk = activeProj === 'all' || r.projeto === activeProj;
+                const mesOk  = activeMes  === 'all' || (d && (d.getMonth()+1) == activeMes);
+                const srchOk = !s || r.chamado.toLowerCase().includes(s)
+                                  || r.assunto.toLowerCase().includes(s)
+                                  || r.id.toLowerCase().includes(s);
+                return anoOk && projOk && mesOk && srchOk;
+            });
+        }
+
+        function applyFilters() {
+            const f = getFiltered();
+            updateKPIs(f);
+            renderKanban(f);
+            renderPipeline(f);
+            renderRelatorio(f);
+            renderFaturamento(f);
+        }
+
+        function updateDashboard() {
+            const sels = document.querySelectorAll('.filters select');
+            activeAno  = sels[0] ? sels[0].value : 'all';
+            activeProj = sels[1] ? sels[1].value : 'all';
+            activeMes  = sels[2] ? sels[2].value : 'all';
+            applyFilters();
+        }
+
+        function onSearch(inp) {
+            activeSearch = inp.value;
+            document.getElementById('search-clr').style.display = inp.value ? 'block' : 'none';
+            if (inp.value) {
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.getElementById('pipeline').classList.add('active');
+                document.querySelectorAll('.nav-tab')[1].classList.add('active');
+            }
+            applyFilters();
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-clr').style.display = 'none';
+            activeSearch = '';
+            applyFilters();
+        }
+
+        // ── KPIs ──────────────────────────────────────────────────────────
+        function updateKPIs(f) {
+            const q = (cls) => document.querySelector('.kpi-card.' + cls + ' .kpi-value');
+            if (q('info'))    q('info').textContent    = f.length;
+            if (q('success')) q('success').textContent = f.filter(r=>r.status==='Concluída').length;
+            if (q('warning')) q('warning').textContent = f.filter(r=>r.status==='Execução').length;
+            if (q('danger'))  q('danger').textContent  = f.filter(r=>r.status==='Bloqueada').length;
+        }
+
+        // ── KANBAN ────────────────────────────────────────────────────────
+        function renderKanban(f) {
+            const board = document.querySelector('.kanban');
+            if (!board) return;
+            board.innerHTML = '';
+            KANBAN_STAGES.forEach(({key, label, cls}) => {
+                const items = f.filter(r => r.status === key);
+                const col = document.createElement('div');
+                col.className = `kanban-column ${cls}`;
+                col.innerHTML = `<h3>${label} <span class="count">${items.length}</span></h3>`;
+                if (!items.length) {
+                    col.innerHTML += `<div style="color:#374151;font-size:11px;text-align:center;padding:20px 0">—</div>`;
+                } else {
+                    items.slice(0, 8).forEach(r => {
+                        col.innerHTML += `<div class="card">
+                            <div class="card-id">${r.chamado || r.id}</div>
+                            <div class="card-project">${r.projeto}</div>
+                            <div class="card-title">${r.assunto.slice(0,55)}${r.assunto.length>55?'…':''}</div>
+                            ${r.hrs_est ? `<div style="font-size:10px;color:#6b7280;margin-top:3px">⏱ ${r.hrs_est}h est.</div>` : ''}
+                        </div>`;
+                    });
+                    if (items.length > 8)
+                        col.innerHTML += `<div style="font-size:10px;color:#6b7280;text-align:center;padding:6px">+${items.length-8} mais</div>`;
+                }
+                board.appendChild(col);
+            });
+        }
+
+        // ── PIPELINE TABLE ────────────────────────────────────────────────
+        function renderPipeline(f) {
+            const s = activeSearch.toLowerCase().trim();
+            const info = document.getElementById('search-info');
+            if (info) info.innerHTML = s
+                ? `<span class="srch-count">${f.length}</span> resultado${f.length!==1?'s':''} para "<strong>${activeSearch}</strong>"`
+                : `${f.length} chamado${f.length!==1?'s':''} exibido${f.length!==1?'s':''}`;
+
+            const tbody = document.querySelector('#pipeline table tbody');
+            if (!tbody) return;
+            if (!f.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#4b5563;padding:28px">Nenhum resultado encontrado.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = f.map(r => {
+                const pc = STATUS_CLASS[r.status] || 's-back';
+                const dt = r.data ? r.data.split('-').reverse().join('/') : '—';
+                const isMatch = s && (r.chamado.toLowerCase().includes(s) || r.assunto.toLowerCase().includes(s));
+                return `<tr class="${isMatch?'srch-match':''}">
+                    <td style="font-size:10px;color:#6b7280">${r.id}</td>
+                    <td>${r.chamado ? `<span style="background:rgba(0,177,64,.12);color:#4ADE80;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600">${r.chamado}</span>` : '—'}</td>
+                    <td>${hlText(r.assunto, s)}</td>
+                    <td style="white-space:nowrap;font-size:11px;color:#9ca3af">${dt}</td>
+                    <td><span class="badge badge-${r.status==='Concluída'?'baixa':r.status==='Bloqueada'?'alta':'media'}">${r.status}</span></td>
+                    <td style="font-size:11px">${r.projeto}</td>
+                    <td style="text-align:center">${r.hrs_est||'—'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function hlText(text, term) {
+            if (!term) return text;
+            const idx = text.toLowerCase().indexOf(term);
+            if (idx < 0) return text;
+            return text.slice(0,idx) + `<mark style="background:rgba(0,177,64,.25);color:#4ADE80;border-radius:2px;padding:0 2px">${text.slice(idx,idx+term.length)}</mark>` + text.slice(idx+term.length);
+        }
+
+        // ── RELATÓRIOS ────────────────────────────────────────────────────
+        function renderRelatorio(f) {
+            const projs = [...new Set(f.map(r=>r.projeto).filter(Boolean))].sort();
+            const tbody = document.querySelector('#relatorio table tbody');
+            if (tbody) {
+                tbody.innerHTML = projs.map(p => {
+                    const pr = f.filter(r=>r.projeto===p);
+                    return `<tr>
+                        <td>${p}</td>
+                        <td>${pr.length}</td>
+                        <td>${pr.reduce((a,r)=>a+r.hrs_est,0)||'—'}</td>
+                        <td style="color:#22c55e">${pr.filter(r=>r.status==='Concluída').length}</td>
+                        <td style="color:#f59e0b">${pr.filter(r=>r.status==='Execução').length}</td>
+                        <td style="color:#ef4444">${pr.filter(r=>r.status==='Bloqueada').length}</td>
+                    </tr>`;
+                }).join('');
+            }
+            if (chartRelatorio) { chartRelatorio.destroy(); chartRelatorio = null; }
+            const ctx = document.getElementById('chartDemandas');
+            if (ctx && projs.length) {
+                chartRelatorio = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: projs,
+                        datasets: [
+                            {label:'Concluídas', data:projs.map(p=>f.filter(r=>r.projeto===p&&r.status==='Concluída').length), backgroundColor:'#00B140', borderRadius:4},
+                            {label:'Execução',   data:projs.map(p=>f.filter(r=>r.projeto===p&&r.status==='Execução').length),  backgroundColor:'#f59e0b', borderRadius:4},
+                            {label:'Bloqueadas', data:projs.map(p=>f.filter(r=>r.projeto===p&&r.status==='Bloqueada').length), backgroundColor:'#ef4444', borderRadius:4},
+                        ]
+                    },
+                    options: {
+                        responsive:true, maintainAspectRatio:false,
+                        plugins:{legend:{labels:{color:'#e5e7eb',font:{size:11}}}},
+                        scales:{
+                            y:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(107,114,128,0.1)'}},
+                            x:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(107,114,128,0.1)'}}
+                        }
+                    }
+                });
+            }
+        }
+
+        // ── FATURAMENTO ───────────────────────────────────────────────────
+        function renderFaturamento(f) {
+            const conc = f.filter(r=>r.status==='Concluída');
+            const hReal = conc.reduce((a,r)=>a+r.hrs_real,0);
+            const hContr = 60;
+            const hRest = Math.max(0, hContr - hReal);
+            const pct = Math.min(100, Math.round(hReal/hContr*100));
+            const over = hReal > hContr;
+            const color = over ? '#ef4444' : pct>=80 ? '#f59e0b' : '#00B140';
+
+            const cards = document.querySelectorAll('.faturamento-summary .summary-card');
+            if (cards.length >= 4) {
+                cards[0].querySelector('.value').textContent = f.length;
+                cards[2].querySelector('.value').textContent = hReal.toFixed(0) + 'h';
+                cards[2].querySelector('.value').style.color = color;
+                cards[3].querySelector('.value').textContent = hRest.toFixed(0) + 'h';
+                cards[3].querySelector('.value').style.color = over ? '#ef4444' : '#00B140';
+            }
+
+            const tbody = document.querySelector('#faturamento table tbody');
+            if (!tbody) return;
+            if (!conc.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#4b5563;padding:24px">Nenhum chamado concluído no período selecionado.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = conc.map(r => {
+                const dt = r.data ? r.data.split('-').reverse().join('/') : '—';
+                return `<tr>
+                    <td style="font-size:10px;color:#6b7280">${r.id}</td>
+                    <td>${r.chamado?`<span style="background:rgba(0,177,64,.12);color:#4ADE80;border-radius:3px;padding:1px 5px;font-size:10px">${r.chamado}</span>`:'—'}</td>
+                    <td>${dt}</td>
+                    <td>${r.assunto.slice(0,60)}${r.assunto.length>60?'…':''}</td>
+                    <td style="font-size:11px">${r.projeto}</td>
+                    <td style="text-align:center">${r.hrs_est||'—'}</td>
+                    <td>✅ Concluída</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── UTILS ─────────────────────────────────────────────────────────
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            element.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>
