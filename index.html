@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soluti - Painel Executivo de Projetos</title>
+    <title>Soluti — Painel Executivo de Projetos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
 
@@ -383,8 +383,8 @@
     <div class="login-card">
         <div class="login-logo">
             <div class="login-logo-mark">GO</div>
-            <div class="login-title">Soluti - Painel Executivo</div>
-            <div class="login-sub">Gestão Online - Acesso restrito</div>
+            <div class="login-title">Soluti — Painel Executivo</div>
+            <div class="login-sub">Gestão Online — Acesso restrito</div>
         </div>
         <div class="login-error" id="login-error">E-mail ou senha incorretos. Tente novamente.</div>
         <div class="login-field">
@@ -406,7 +406,7 @@
 <div class="container">
         <header>
             <div class="header-left">
-                <h1>Soluti - Painel Executivo de Projetos</h1>
+                <h1>Soluti — Painel Executivo de Projetos</h1>
                 <p>Gestão estratégica de demandas e entregas — Gestão Online</p>
             </div>
             <div class="header-right">
@@ -1160,11 +1160,11 @@
     <script>
         const SUPA_URL = 'https://ikzbjnedlftysizmetko.supabase.co';
         const SUPA_KEY = 'sb_publishable_pqZTWYuYG1ivTRJIm4X3Iw_kLgD-J0z';
-        const supabase = window.supabase.createClient(SUPA_URL, SUPA_KEY);
+        const _sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
 
         // ── VERIFICAR SESSÃO AO CARREGAR ─────────────────────────────────
         async function checkSession() {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await _sb.auth.getSession();
             if (session) {
                 showDashboard(session.user.email);
             } else {
@@ -1202,7 +1202,7 @@
             btn.textContent = 'Entrando…';
             errBox.style.display = 'none';
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await _sb.auth.signInWithPassword({ email, password });
 
             if (error) {
                 errBox.textContent = 'E-mail ou senha incorretos. Tente novamente.';
@@ -1219,7 +1219,7 @@
 
         // ── LOGOUT ────────────────────────────────────────────────────────
         async function doLogout() {
-            await supabase.auth.signOut();
+            await _sb.auth.signOut();
             showLogin();
         }
 
