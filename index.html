@@ -7,54 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
 
-        /* ── LOGIN ── */
-        #login-screen {
-            display: flex; align-items: center; justify-content: center;
-            min-height: 100vh; background: #F7F8FA;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-        .login-card {
-            background: #FFFFFF; border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(16,24,40,.1);
-            padding: 48px 40px; width: 100%; max-width: 420px;
-            border-top: 4px solid #12B76A;
-        }
-        .login-logo {
-            text-align: center; margin-bottom: 32px;
-        }
-        .login-logo-mark {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 52px; height: 52px; border-radius: 14px;
-            background: linear-gradient(135deg, #12B76A, #0DA15E);
-            font-weight: 800; font-size: 20px; color: #fff;
-            margin-bottom: 16px; box-shadow: 0 4px 12px rgba(18,183,106,.3);
-        }
-        .login-title { font-size: 22px; font-weight: 700; color: #101828; margin-bottom: 4px; }
-        .login-sub   { font-size: 13px; color: #667085; }
-        .login-field { margin-bottom: 16px; }
-        .login-field label { display: block; font-size: 13px; font-weight: 600; color: #344054; margin-bottom: 6px; }
-        .login-field input {
-            width: 100%; padding: 10px 14px;
-            border: 1.5px solid #D0D5DD; border-radius: 8px;
-            font-size: 14px; color: #101828; background: #fff;
-            transition: border-color .15s; box-sizing: border-box;
-        }
-        .login-field input:focus { border-color: #12B76A; outline: none; box-shadow: 0 0 0 3px rgba(18,183,106,.1); }
-        .login-btn {
-            width: 100%; padding: 11px; background: #12B76A;
-            border: none; border-radius: 8px; color: #fff;
-            font-size: 14px; font-weight: 600; cursor: pointer;
-            transition: all .2s; margin-top: 8px;
-        }
-        .login-btn:hover { background: #0DA15E; box-shadow: 0 4px 12px rgba(18,183,106,.3); transform: translateY(-1px); }
-        .login-btn:disabled { background: #D0D5DD; cursor: not-allowed; transform: none; box-shadow: none; }
-        .login-error {
-            background: #FEF3F2; border: 1px solid #FDA29B; border-radius: 8px;
-            padding: 10px 14px; font-size: 13px; color: #B42318;
-            margin-bottom: 16px; display: none;
-        }
-        .login-footer { text-align: center; margin-top: 24px; font-size: 12px; color: #98A2B3; }
-        #dashboard-screen { display: none; }
+        
 
         /* ── RESET ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -378,30 +331,6 @@
 
 
     
-<!-- ── TELA DE LOGIN ── -->
-<div id="login-screen">
-    <div class="login-card">
-        <div class="login-logo">
-            <div class="login-logo-mark">GO</div>
-            <div class="login-title">Soluti — Painel Executivo</div>
-            <div class="login-sub">Gestão Online — Acesso restrito</div>
-        </div>
-        <div class="login-error" id="login-error">E-mail ou senha incorretos. Tente novamente.</div>
-        <div class="login-field">
-            <label>E-mail</label>
-            <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
-        </div>
-        <div class="login-field">
-            <label>Senha</label>
-            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <button class="login-btn" id="login-btn" onclick="doLogin()">Entrar</button>
-        <div class="login-footer">© Gestão Online — Acesso autorizado apenas para usuários cadastrados</div>
-    </div>
-</div>
-
-<!-- ── DASHBOARD ── -->
-<div id="dashboard-screen">
 
 <div class="container">
         <header>
@@ -1150,87 +1079,6 @@
             document.getElementById(tabName).classList.add('active');
             element.classList.add('active');
         }
-    </script>
-
-</div><!-- /dashboard-screen -->
-
-    <!-- ── SUPABASE AUTH ── -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        const SUPA_URL = 'https://ikzbjnedlftysizmetko.supabase.co';
-        const SUPA_KEY = 'sb_publishable_pqZTWYuYG1ivTRJIm4X3Iw_kLgD-J0z';
-        const _sb = window.supabase.createClient(SUPA_URL, SUPA_KEY);
-
-        // ── VERIFICAR SESSÃO AO CARREGAR ─────────────────────────────────
-        async function checkSession() {
-            const { data: { session } } = await _sb.auth.getSession();
-            if (session) {
-                showDashboard(session.user.email);
-            } else {
-                showLogin();
-            }
-        }
-
-        function showLogin() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard-screen').style.display = 'none';
-        }
-
-        function showDashboard(email) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard-screen').style.display = 'block';
-            // Mostrar usuário logado no header
-            const lastUpd = document.getElementById('lastUpdate');
-            if (lastUpd) lastUpd.textContent = email;
-        }
-
-        // ── LOGIN ─────────────────────────────────────────────────────────
-        async function doLogin() {
-            const email    = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            const btn      = document.getElementById('login-btn');
-            const errBox   = document.getElementById('login-error');
-
-            if (!email || !password) {
-                errBox.textContent = 'Preencha e-mail e senha.';
-                errBox.style.display = 'block';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.textContent = 'Entrando…';
-            errBox.style.display = 'none';
-
-            const { data, error } = await _sb.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                errBox.textContent = 'E-mail ou senha incorretos. Tente novamente.';
-                errBox.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'Entrar';
-                return;
-            }
-
-            showDashboard(data.user.email);
-            setNow('Gestão Online');
-            applyFilters();
-        }
-
-        // ── LOGOUT ────────────────────────────────────────────────────────
-        async function doLogout() {
-            await _sb.auth.signOut();
-            showLogin();
-        }
-
-        // Enter para login
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') {
-                doLogin();
-            }
-        });
-
-        // Verificar sessão ao abrir
-        checkSession();
     </script>
 
 </body>
