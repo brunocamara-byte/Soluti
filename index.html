@@ -666,7 +666,7 @@
                         <th>Projeto</th>
                         <th style="white-space:nowrap;text-align:center">Data Ticket</th>
                         <th style="white-space:nowrap;text-align:center">Data Conclusão</th>
-                        <th style="white-space:nowrap;text-align:center">Horas Estimadas</th>
+                        <th style="white-space:nowrap;text-align:center">Horas Faturadas</th>
                         <th>Status</th>
                     </tr></thead>
                     <tbody id="fat-body"></tbody>
@@ -1063,19 +1063,14 @@
             if (regAnt) regAnt.style.display = novo ? 'none' : 'block';
             if (regNov) regNov.style.display = novo ? 'block' : 'none';
 
-            // REGRA DE FATURAMENTO: Status=Concluída, filtra por DATA CONCLUSÃO
-            // Se data_conc não preenchida, usa data do ticket como fallback
+            // REGRA DE FATURAMENTO: Status=Concluída E Data Conclusão preenchida
+            // Filtra pelo mês/ano da Data Conclusão — não pela data do ticket
             const conc = ALL_RECORDS.filter(r => {
                 if (r.status !== 'Concluída') return false;
-                // Usa data_conc se preenchida, senão usa data do ticket
-                const dataFat = r.data_conc ? r.data_conc : r.data;
-                if (!dataFat) return false;
-                const dc = new Date(dataFat);
-                // Filtro de projeto (se selecionado)
+                if (!r.data_conc) return false; // sem data conclusão = não fatura
+                const dc = new Date(r.data_conc);
                 if (activeProj !== 'all' && r.projeto !== activeProj) return false;
-                // Filtro de ano pela data de faturamento
                 if (activeAno !== 'all' && dc.getFullYear() != activeAno) return false;
-                // Filtro de mês pela data de faturamento
                 if (activeMes !== 'all' && (dc.getMonth()+1) != activeMes) return false;
                 return true;
             });
@@ -1102,19 +1097,7 @@
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text4);padding:28px">Nenhum chamado concluído no período selecionado.</td></tr>';
                 return;
             }
-            // Verificar se dados têm data_conc (pós-sincronização)
-            const temDataConc = conc.some(r => r.data_conc);
-            if (!temDataConc && conc.length > 0) {
-                // Mostrar aviso para sincronizar
-                const avisoDiv = document.querySelector('#faturamento .aviso-sync');
-                if (!avisoDiv) {
-                    const av = document.createElement('div');
-                    av.className = 'aviso-sync';
-                    av.style.cssText = 'background:#FFFAEB;border:1px solid #FEC84B;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#B54708';
-                    av.innerHTML = '⚠️ <strong>Clique em Sincronizar</strong> para carregar as datas de conclusão e calcular o faturamento corretamente.';
-                    tbody.closest('table').before(av);
-                }
-            }
+
             tbody.innerHTML = conc.map(r => {
                 const dt      = r.data      ? r.data.split('-').reverse().join('/')      : '—';
                 const dt_conc = r.data_conc ? r.data_conc.split('-').reverse().join('/') : '—';
@@ -1124,7 +1107,7 @@
                     <td style="white-space:nowrap"><span style="background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--text2)">${r.projeto}</span></td>
                     <td style="font-size:12px;color:var(--text3);white-space:nowrap;text-align:center">${dt}</td>
                     <td style="font-size:12px;white-space:nowrap;text-align:center">${dt_conc !== '—' ? `<span style="color:var(--green-d);font-weight:600">${dt_conc}</span>` : '<span style="color:var(--text4);font-size:11px">—</span>'}</td>
-                    <td style="text-align:center;font-size:12px;font-weight:600;color:var(--text2)">${r.hrs_est ? r.hrs_est+'h' : '—'}</td>
+                    <td style="text-align:center;font-size:12px;font-weight:600;color:var(--green-d)">${r.hrs_real ? r.hrs_real+'h' : '—'}</td>
                     <td><span class="badge badge-baixa">Concluída</span></td>
                 </tr>`;
             }).join('');
