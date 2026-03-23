@@ -1063,22 +1063,34 @@
             if (regAnt) regAnt.style.display = novo ? 'none' : 'block';
             if (regNov) regNov.style.display = novo ? 'block' : 'none';
 
-            const conc = f.filter(r => r.status === 'Concluída');
+            // REGRA DE FATURAMENTO: Status=Concluída E data_conc no mês/ano selecionado
+            // Ignora a data do ticket — o que importa é QUANDO foi concluído
+            const conc = ALL_RECORDS.filter(r => {
+                if (r.status !== 'Concluída') return false;
+                if (!r.data_conc) return false;
+                const dc = new Date(r.data_conc);
+                // Filtro de projeto (se selecionado)
+                if (activeProj !== 'all' && r.projeto !== activeProj) return false;
+                // Filtro de ano pela data de conclusão
+                if (activeAno !== 'all' && dc.getFullYear() != activeAno) return false;
+                // Filtro de mês pela data de conclusão
+                if (activeMes !== 'all' && (dc.getMonth()+1) != activeMes) return false;
+                return true;
+            });
 
             if (!novo) {
                 // REGIME ANTIGO: todos os projetos, 40h
                 const used = conc.reduce((a,r) => a+r.hrs_real, 0);
-                updateCard('fat-uni-used','fat-uni-rest','fat-uni-rest-card','fat-uni-exc','fat-uni-exc-card',null,'fat-uni-dem',used,40,f.length);
+                updateCard('fat-uni-used','fat-uni-rest','fat-uni-rest-card','fat-uni-exc','fat-uni-exc-card',null,'fat-uni-dem',used,40,conc.length);
             } else {
                 // REGIME NOVO: Ecommerce 40h + Sales Ops 60h
+                // conc já está filtrado por data_conc + mês/ano
                 const concEc = conc.filter(r => r.projeto === 'Ecommerce');
                 const concSl = conc.filter(r => r.projeto === 'Sales Ops');
-                const fEc    = f.filter(r => r.projeto === 'Ecommerce');
-                const fSl    = f.filter(r => r.projeto === 'Sales Ops');
                 const usedEc = concEc.reduce((a,r) => a+r.hrs_real, 0);
                 const usedSl = concSl.reduce((a,r) => a+r.hrs_real, 0);
-                updateCard('fat-ec-used','fat-ec-rest','fat-ec-rest-card','fat-ec-exc','fat-ec-exc-card','fat-ec-sem','fat-ec-dem',usedEc,40,fEc.length);
-                updateCard('fat-sl-used','fat-sl-rest','fat-sl-rest-card','fat-sl-exc','fat-sl-exc-card','fat-sl-sem','fat-sl-dem',usedSl,60,fSl.length);
+                updateCard('fat-ec-used','fat-ec-rest','fat-ec-rest-card','fat-ec-exc','fat-ec-exc-card','fat-ec-sem','fat-ec-dem',usedEc,40,concEc.length);
+                updateCard('fat-sl-used','fat-sl-rest','fat-sl-rest-card','fat-sl-exc','fat-sl-exc-card','fat-sl-sem','fat-sl-dem',usedSl,60,concSl.length);
             }
 
             // Tabela chamados concluídos
