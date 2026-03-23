@@ -603,35 +603,63 @@
         <!-- FATURAMENTO -->
         <div id="faturamento" class="tab-content">
             <div class="section-title">Faturamento</div>
-            
-            <div class="faturamento-summary" id="fat-summary-grid" style="grid-template-columns:repeat(5,1fr)">
-                <div class="summary-card">
-                    <div class="label">Demandas</div>
-                    <div class="value" id="fat-dem">—</div>
+
+            <!-- REGIME ANTIGO: antes de Out/2025 -->
+            <div id="fat-regime-antigo" style="display:none">
+                <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:10px 16px;margin:0 0 14px;font-size:12px;color:#92400E">
+                    📋 <strong>Contrato Único — 40h/mês</strong> — Período anterior a Outubro/2025. Todos os projetos somados.
                 </div>
-                <div class="summary-card">
-                    <div class="label">Contrato Mensal</div>
-                    <div class="value">60h</div>
-                </div>
-                <div class="summary-card">
-                    <div class="label">Horas Utilizadas</div>
-                    <div class="value" id="fat-used">—</div>
-                </div>
-                <div class="summary-card" id="fat-excedente-card" style="border-left-color:var(--red);display:none">
-                    <div class="label" style="color:var(--red-d)">⚠️ Excedente</div>
-                    <div class="value" id="fat-exc" style="color:var(--red-d)">—</div>
-                    <div style="font-size:10px;color:var(--red);margin-top:4px" id="fat-exc-msg"></div>
-                </div>
-                <div class="summary-card" id="fat-restantes-card">
-                    <div class="label">Horas Restantes</div>
-                    <div class="value" id="fat-rest">—</div>
+                <div class="faturamento-summary" style="grid-template-columns:repeat(4,1fr)">
+                    <div class="summary-card"><div class="label">Demandas</div><div class="value" id="fat-uni-dem">—</div></div>
+                    <div class="summary-card"><div class="label">Contrato Mensal</div><div class="value">40h</div></div>
+                    <div class="summary-card"><div class="label">Horas Utilizadas</div><div class="value" id="fat-uni-used">—</div></div>
+                    <div class="summary-card" id="fat-uni-rest-card"><div class="label">Horas Restantes</div><div class="value" id="fat-uni-rest">—</div></div>
+                    <div class="summary-card" id="fat-uni-exc-card" style="display:none;border-left-color:var(--red)"><div class="label" style="color:var(--red-d)">⚠️ Excedente</div><div class="value" id="fat-uni-exc" style="color:var(--red-d)">—</div></div>
                 </div>
             </div>
 
-            <div class="section-title">Chamados Concluídos</div>
-            <table>
-                <thead>
-                    <tr>
+            <!-- REGIME NOVO: Out/2025 em diante -->
+            <div id="fat-regime-novo" style="display:none">
+                <div style="background:#ECFDF3;border:1px solid #A9EFC5;border-radius:8px;padding:10px 16px;margin:0 0 14px;font-size:12px;color:#027A48">
+                    📋 <strong>Contratos Separados</strong> — E-commerce 40h/mês  +  Sales Ops 60h/mês
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+                    <!-- Ecommerce -->
+                    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
+                        <div style="background:#1A5276;color:#fff;padding:10px 16px;font-size:12px;font-weight:700">📦 E-COMMERCE — 40h/mês</div>
+                        <div class="faturamento-summary" style="grid-template-columns:repeat(3,1fr);border:none">
+                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Demandas</div><div class="value" id="fat-ec-dem">—</div></div>
+                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Horas Utilizadas</div><div class="value" id="fat-ec-used">—</div></div>
+                            <div class="summary-card" style="border:none;border-radius:0" id="fat-ec-rest-card"><div class="label">Horas Restantes</div><div class="value" id="fat-ec-rest">—</div></div>
+                        </div>
+                        <div id="fat-ec-sem" style="padding:10px 16px;font-size:12px;font-weight:600;text-align:center;border-top:1px solid var(--border)">—</div>
+                        <div id="fat-ec-exc-card" style="display:none;padding:10px 16px;background:var(--red-l);border-top:1px solid var(--border)">
+                            <div style="font-size:11px;color:var(--red-d);font-weight:600">⚠️ Excedente</div>
+                            <div id="fat-ec-exc" style="font-size:22px;font-weight:700;color:var(--red-d)">—</div>
+                        </div>
+                    </div>
+                    <!-- Sales Ops -->
+                    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
+                        <div style="background:#1E8449;color:#fff;padding:10px 16px;font-size:12px;font-weight:700">📦 SALES OPS — 60h/mês</div>
+                        <div class="faturamento-summary" style="grid-template-columns:repeat(3,1fr);border:none">
+                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Demandas</div><div class="value" id="fat-sl-dem">—</div></div>
+                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Horas Utilizadas</div><div class="value" id="fat-sl-used">—</div></div>
+                            <div class="summary-card" style="border:none;border-radius:0" id="fat-sl-rest-card"><div class="label">Horas Restantes</div><div class="value" id="fat-sl-rest">—</div></div>
+                        </div>
+                        <div id="fat-sl-sem" style="padding:10px 16px;font-size:12px;font-weight:600;text-align:center;border-top:1px solid var(--border)">—</div>
+                        <div id="fat-sl-exc-card" style="display:none;padding:10px 16px;background:var(--red-l);border-top:1px solid var(--border)">
+                            <div style="font-size:11px;color:var(--red-d);font-weight:600">⚠️ Excedente</div>
+                            <div id="fat-sl-exc" style="font-size:22px;font-weight:700;color:var(--red-d)">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABELA CHAMADOS CONCLUÍDOS -->
+            <div class="section-title" style="margin-top:8px">Chamados Concluídos</div>
+            <div class="tbl-wrap">
+                <table>
+                    <thead><tr>
                         <th style="white-space:nowrap">Chamado</th>
                         <th style="min-width:240px">Assunto</th>
                         <th>Projeto</th>
@@ -639,51 +667,28 @@
                         <th style="white-space:nowrap;text-align:center">Data Conclusão</th>
                         <th style="white-space:nowrap;text-align:center">Horas Estimadas</th>
                         <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>#5587</td>
-                        <td>2026-03-02</td>
-                        <td>Atualização jornada checkout</td>
-                        <td>Ecommerce</td>
-                        <td>16h</td>
-                        <td>✅ Faturado</td>
-                    </tr>
-                    <tr>
-                        <td>#5700</td>
-                        <td>2026-03-03</td>
-                        <td>Ajuste Integração Sankhya</td>
-                        <td>Ecommerce</td>
-                        <td>1h</td>
-                        <td>✅ Faturado</td>
-                    </tr>
-                    <tr>
-                        <td>#6103</td>
-                        <td>2026-03-10</td>
-                        <td>Melhoria em Dashboard</td>
-                        <td>Sales Ops</td>
-                        <td>8h</td>
-                        <td>✅ Faturado</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div style="background:#EFF8FF;border:1px solid #B2DDFF;border-radius:10px;padding:14px 18px;margin:0 20px 12px;display:flex;align-items:flex-start;gap:12px">
+                    </tr></thead>
+                    <tbody id="fat-body"></tbody>
+                </table>
+            </div>
+            <div style="background:#EFF8FF;border:1px solid #B2DDFF;border-radius:10px;padding:14px 18px;margin:12px 0;display:flex;align-items:flex-start;gap:12px">
                 <span style="font-size:18px;flex-shrink:0">ℹ️</span>
                 <div>
                     <div style="font-weight:600;color:#1D4ED8;font-size:13px;margin-bottom:4px">Sobre horas estimadas e horas faturadas</div>
-                    <div style="color:#1E40AF;font-size:12px;line-height:1.6">As horas faturadas podem diferir das estimadas inicialmente. Durante a execução dos projetos, ajustes técnicos e mudanças na trajetória das demandas podem impactar o tempo real de entrega. </div>
+                    <div style="color:#1E40AF;font-size:12px;line-height:1.6">As horas faturadas podem diferir das estimadas inicialmente. Durante a execução dos projetos, ajustes técnicos e mudanças na trajetória das demandas podem impactar o tempo real de entrega.</div>
                 </div>
             </div>
             <div class="info-box">
                 <strong style="color: #1A2332;">📌 Observação:</strong><br>
-                Horas não utilizadas no mês não acumulam para o período seguinte. O contrato de 60h renova integralmente todo mês.
+                Horas não utilizadas no mês não acumulam para o período seguinte. O contrato renova integralmente todo mês.
             </div>
         </div>
+
+        </div><!-- /main-panel -->
+
     </div>
 
-    <div class="footer">
+<div class="footer">
         © Gestão Online — Todos os direitos reservados
     </div>
 
@@ -1016,48 +1021,66 @@
             }
         }
 
-        // ── FATURAMENTO ───────────────────────────────────────────────────
+                // ── FATURAMENTO ────────────────────────────────────────────────────
+        function isRegimeNovo() {
+            // Regime novo: Out/2025 em diante
+            if (activeAno === 'all') return true; // default novo
+            const ano = parseInt(activeAno);
+            const mes = activeMes === 'all' ? 1 : parseInt(activeMes);
+            if (ano > 2025) return true;
+            if (ano === 2025 && mes >= 10) return true;
+            return false;
+        }
+
+        function semaforo(used, limit) {
+            const pct = limit > 0 ? used / limit : 0;
+            const over = used > limit;
+            if (over) return { icon: '🔴', label: `ESTOUROU — +${(used-limit).toFixed(1)}h extras`, color: 'var(--red-d)', bg: 'var(--red-l)' };
+            if (pct >= 0.8) return { icon: '🟡', label: `ATENÇÃO — ${used.toFixed(1)}h de ${limit}h (${Math.round(pct*100)}%)`, color: 'var(--yellow-d)', bg: 'var(--yellow-l)' };
+            return { icon: '🟢', label: `OK — ${used.toFixed(1)}h de ${limit}h (${Math.round(pct*100)}%)`, color: 'var(--green-d)', bg: 'var(--green-l)' };
+        }
+
+        function updateCard(idUsed, idRest, idRestCard, idExc, idExcCard, idSem, idDem, used, limit, dem) {
+            const over = used > limit;
+            const rest = Math.max(0, limit - used);
+            const exc  = Math.max(0, used - limit);
+            const sem  = semaforo(used, limit);
+
+            if (idDem)     { const e = document.getElementById(idDem);     if(e) e.textContent = dem; }
+            if (idUsed)    { const e = document.getElementById(idUsed);    if(e) { e.textContent = used.toFixed(1)+'h'; e.style.color = sem.color; } }
+            if (idRest)    { const e = document.getElementById(idRest);    if(e) { e.textContent = rest.toFixed(1)+'h'; e.style.color = over ? 'var(--text4)' : 'var(--green-d)'; } }
+            if (idRestCard){ const e = document.getElementById(idRestCard); if(e) e.style.display = over ? 'none' : 'block'; }
+            if (idExcCard) { const e = document.getElementById(idExcCard);  if(e) e.style.display = over ? 'block' : 'none'; }
+            if (idExc)     { const e = document.getElementById(idExc);     if(e) e.textContent = '+'+exc.toFixed(1)+'h'; }
+            if (idSem)     { const e = document.getElementById(idSem);     if(e) { e.textContent = sem.icon + '  ' + sem.label; e.style.color = sem.color; e.style.background = sem.bg; e.style.borderRadius = '6px'; e.style.padding = '8px 14px'; } }
+        }
+
         function renderFaturamento(f) {
-            const conc = f.filter(r=>r.status==='Concluída');
-            const hReal = conc.reduce((a,r)=>a+r.hrs_real,0);
-            const hContr = 60;
-            const hRest = Math.max(0, hContr - hReal);
-            const pct = Math.min(100, Math.round(hReal/hContr*100));
-            const over = hReal > hContr;
-            const color = over ? '#ef4444' : pct>=80 ? '#f59e0b' : '#1DB954';
+            const novo = isRegimeNovo();
+            const regAnt = document.getElementById('fat-regime-antigo');
+            const regNov = document.getElementById('fat-regime-novo');
+            if (regAnt) regAnt.style.display = novo ? 'none' : 'block';
+            if (regNov) regNov.style.display = novo ? 'block' : 'none';
 
-            // Atualizar cards por ID
-            const elDem  = document.getElementById('fat-dem');
-            const elUsed = document.getElementById('fat-used');
-            const elRest = document.getElementById('fat-rest');
-            const elExc  = document.getElementById('fat-exc');
-            const elExcMsg = document.getElementById('fat-exc-msg');
-            const cardExc  = document.getElementById('fat-excedente-card');
-            const cardRest = document.getElementById('fat-restantes-card');
+            const conc = f.filter(r => r.status === 'Concluída');
 
-            if (elDem)  elDem.textContent  = f.length;
-            if (elUsed) {
-                elUsed.textContent = hReal.toFixed(1) + 'h';
-                elUsed.style.color = over ? 'var(--red-d)' : hReal/hContr >= 0.8 ? 'var(--yellow-d)' : 'var(--green-d)';
-            }
-
-            if (over) {
-                // Excedente — mostrar card vermelho
-                const hExc = hReal - hContr;
-                if (cardExc)  cardExc.style.display  = 'block';
-                if (cardRest) cardRest.style.display  = 'none';
-                if (elExc)    elExc.textContent = '+' + hExc.toFixed(1) + 'h';
-                if (elExcMsg) elExcMsg.textContent = 'Acima do contrato de 60h';
+            if (!novo) {
+                // REGIME ANTIGO: todos os projetos, 40h
+                const used = conc.reduce((a,r) => a+r.hrs_real, 0);
+                updateCard('fat-uni-used','fat-uni-rest','fat-uni-rest-card','fat-uni-exc','fat-uni-exc-card',null,'fat-uni-dem',used,40,f.length);
             } else {
-                // Dentro do contrato — mostrar horas restantes
-                if (cardExc)  cardExc.style.display  = 'none';
-                if (cardRest) cardRest.style.display  = 'block';
-                if (elRest) {
-                    elRest.textContent = hRest.toFixed(1) + 'h';
-                    elRest.style.color = hRest === 0 ? 'var(--text4)' : 'var(--green-d)';
-                }
+                // REGIME NOVO: Ecommerce 40h + Sales Ops 60h
+                const concEc = conc.filter(r => r.projeto === 'Ecommerce');
+                const concSl = conc.filter(r => r.projeto === 'Sales Ops');
+                const fEc    = f.filter(r => r.projeto === 'Ecommerce');
+                const fSl    = f.filter(r => r.projeto === 'Sales Ops');
+                const usedEc = concEc.reduce((a,r) => a+r.hrs_real, 0);
+                const usedSl = concSl.reduce((a,r) => a+r.hrs_real, 0);
+                updateCard('fat-ec-used','fat-ec-rest','fat-ec-rest-card','fat-ec-exc','fat-ec-exc-card','fat-ec-sem','fat-ec-dem',usedEc,40,fEc.length);
+                updateCard('fat-sl-used','fat-sl-rest','fat-sl-rest-card','fat-sl-exc','fat-sl-exc-card','fat-sl-sem','fat-sl-dem',usedSl,60,fSl.length);
             }
 
+            // Tabela chamados concluídos
             const tbody = document.querySelector('#faturamento table tbody');
             if (!tbody) return;
             if (!conc.length) {
