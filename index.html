@@ -365,6 +365,7 @@
                 <select id="f-proj" onchange="updateDashboard()">
                     <option value="all" selected>Todos</option>
                     <option value="Ecommerce">Ecommerce</option>
+                    <option value="Geral - Soluti">Geral - Soluti</option>
                                         <option value="V.D.">V.D.</option>
                     <option value="SolutiPRO">SolutiPRO</option>
                     <option value="Sales Ops">Sales Ops</option>
@@ -838,8 +839,6 @@
         function getFiltered() {
             const s = activeSearch.toLowerCase().trim();
             return ALL_RECORDS.filter(r => {
-                // Geral - Soluti é interno — não aparece no dashboard cliente
-                if (r.projeto === 'Geral - Soluti') return false;
                 const d = r.data ? new Date(r.data) : null;
                 const anoOk  = activeAno  === 'all' || (d && d.getFullYear() == activeAno);
                 const projOk = activeProj === 'all' || r.projeto === activeProj;
@@ -1041,7 +1040,9 @@
         }
 
         function updateCard(idUsed, idRest, idRestCard, idExc, idExcCard, idSem, idDem, used, limit, dem) {
-            const over = used > limit;
+            // Só mostra excedente se mês específico selecionado (evita confusão com soma anual)
+            const mesEspecifico = activeMes !== 'all';
+            const over = mesEspecifico && used > limit;
             const rest = Math.max(0, limit - used);
             const exc  = Math.max(0, used - limit);
             const sem  = semaforo(used, limit);
