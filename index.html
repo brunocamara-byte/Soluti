@@ -555,7 +555,7 @@
 
         <!-- RELATÓRIOS -->
         <div id="relatorio" class="tab-content">
-            <div class="section-title">Relatório Comparativo - Março 2026</div>
+            <div class="section-title" id="rel-title">Relatório por Projeto</div>
             <table>
                 <thead>
                     <tr>
@@ -693,7 +693,7 @@
 
     <script>
         // ── CONFIG ────────────────────────────────────────────────────────
-        const PIPELINE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT_cf1JgfP-gPQHy-h9swEqt3QOOGS3OS-5T5gE6TIQONGKUJKzxRESMDrn16EEhzMIzWEyWwDfZvJ-/pub?gid=461656245&single=true&output=csv';
+        const PIPELINE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTKtNip4y7Fd4ucRx3aLaFVXW4RreSRAdrIqNuQj52bX8WKFDmeEuLqMFZHW7jyrH99hIOZLvX4eqAx/pub?gid=765384190&single=true&output=csv';
 
         const STATUS_CLASS = {
             'Concluída':'s-conc','Execução':'s-exec','Backlog':'s-back',
@@ -967,6 +967,14 @@
 
         // ── RELATÓRIOS ────────────────────────────────────────────────────
         function renderRelatorio(f) {
+            // Título dinâmico
+            const relTitle = document.getElementById('rel-title');
+            if (relTitle) {
+                const meses = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                const mesLabel = activeMes !== 'all' ? meses[parseInt(activeMes)] : 'Todos os meses';
+                const anoLabel = activeAno !== 'all' ? activeAno : 'Todos os anos';
+                relTitle.textContent = `Relatório por Projeto — ${mesLabel} / ${anoLabel}`;
+            }
             const projs = [...new Set(f.map(r=>r.projeto).filter(Boolean))].sort();
             const tbody = document.querySelector('#relatorio table tbody');
             if (tbody) {
@@ -1059,14 +1067,12 @@
                 const dt      = r.data      ? r.data.split('-').reverse().join('/')      : '—';
                 const dt_conc = r.data_conc ? r.data_conc.split('-').reverse().join('/') : '—';
                 return `<tr>
-                    <td>${r.chamado ? `<span class="chamado-tag">${r.chamado}</span>` : '<span style="color:var(--text4)">—</span>'}</td>
-                    <td style="min-width:260px;max-width:380px">
-                        <div style="color:var(--text2);line-height:1.45;font-size:13px">${r.assunto}</div>
-                    </td>
-                    <td><span style="background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--text2)">${r.projeto}</span></td>
-                    <td style="font-size:12px;color:var(--text3);white-space:nowrap">${dt}</td>
-                    <td style="font-size:12px;white-space:nowrap">${dt_conc !== '—' ? `<span style="color:var(--green-d);font-weight:600">${dt_conc}</span>` : '<span style="color:var(--text4);font-size:11px">—</span>'}</td>
-                    <td style="text-align:center;font-size:12px;color:var(--text2)">${r.hrs_est ? r.hrs_est+'h' : '—'}</td>
+                    <td style="white-space:nowrap">${r.chamado ? `<span class="chamado-tag">${r.chamado}</span>` : '<span style="color:var(--text4)">—</span>'}</td>
+                    <td style="min-width:240px;max-width:360px"><div style="color:var(--text2);line-height:1.45;font-size:13px">${r.assunto}</div></td>
+                    <td style="white-space:nowrap"><span style="background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--text2)">${r.projeto}</span></td>
+                    <td style="font-size:12px;color:var(--text3);white-space:nowrap;text-align:center">${dt}</td>
+                    <td style="font-size:12px;white-space:nowrap;text-align:center">${dt_conc !== '—' ? `<span style="color:var(--green-d);font-weight:600">${dt_conc}</span>` : '<span style="color:var(--text4);font-size:11px">—</span>'}</td>
+                    <td style="text-align:center;font-size:12px;font-weight:600;color:var(--text2)">${r.hrs_est ? r.hrs_est+'h' : '—'}</td>
                     <td><span class="badge badge-baixa">Concluída</span></td>
                 </tr>`;
             }).join('');
