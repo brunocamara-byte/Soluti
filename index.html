@@ -1063,17 +1063,19 @@
             if (regAnt) regAnt.style.display = novo ? 'none' : 'block';
             if (regNov) regNov.style.display = novo ? 'block' : 'none';
 
-            // REGRA DE FATURAMENTO: Status=Concluída E data_conc no mês/ano selecionado
-            // Ignora a data do ticket — o que importa é QUANDO foi concluído
+            // REGRA DE FATURAMENTO: Status=Concluída, filtra por DATA CONCLUSÃO
+            // Se data_conc não preenchida, usa data do ticket como fallback
             const conc = ALL_RECORDS.filter(r => {
                 if (r.status !== 'Concluída') return false;
-                if (!r.data_conc) return false;
-                const dc = new Date(r.data_conc);
+                // Usa data_conc se preenchida, senão usa data do ticket
+                const dataFat = r.data_conc ? r.data_conc : r.data;
+                if (!dataFat) return false;
+                const dc = new Date(dataFat);
                 // Filtro de projeto (se selecionado)
                 if (activeProj !== 'all' && r.projeto !== activeProj) return false;
-                // Filtro de ano pela data de conclusão
+                // Filtro de ano pela data de faturamento
                 if (activeAno !== 'all' && dc.getFullYear() != activeAno) return false;
-                // Filtro de mês pela data de conclusão
+                // Filtro de mês pela data de faturamento
                 if (activeMes !== 'all' && (dc.getMonth()+1) != activeMes) return false;
                 return true;
             });
@@ -1099,6 +1101,19 @@
             if (!conc.length) {
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text4);padding:28px">Nenhum chamado concluído no período selecionado.</td></tr>';
                 return;
+            }
+            // Verificar se dados têm data_conc (pós-sincronização)
+            const temDataConc = conc.some(r => r.data_conc);
+            if (!temDataConc && conc.length > 0) {
+                // Mostrar aviso para sincronizar
+                const avisoDiv = document.querySelector('#faturamento .aviso-sync');
+                if (!avisoDiv) {
+                    const av = document.createElement('div');
+                    av.className = 'aviso-sync';
+                    av.style.cssText = 'background:#FFFAEB;border:1px solid #FEC84B;border-radius:8px;padding:12px 16px;margin-bottom:12px;font-size:12px;color:#B54708';
+                    av.innerHTML = '⚠️ <strong>Clique em Sincronizar</strong> para carregar as datas de conclusão e calcular o faturamento corretamente.';
+                    tbody.closest('table').before(av);
+                }
             }
             tbody.innerHTML = conc.map(r => {
                 const dt      = r.data      ? r.data.split('-').reverse().join('/')      : '—';
