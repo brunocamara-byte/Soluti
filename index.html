@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -10,10 +10,12 @@
         
 
 
-        /* ── LOGIN ── */
-        #login-screen {
-            display:flex;align-items:center;justify-content:center;
-            min-height:100vh;background:#F7F8FA;
+
+        /* ── LOGIN SIMPLES ── */
+        #login-overlay {
+            position:fixed;top:0;left:0;width:100%;height:100%;
+            background:#F7F8FA;display:flex;align-items:center;
+            justify-content:center;z-index:9999;
             font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
         }
         .login-card {
@@ -30,7 +32,7 @@
             margin-bottom:16px;box-shadow:0 4px 12px rgba(18,183,106,.3);
         }
         .login-title{font-size:22px;font-weight:700;color:#101828;margin-bottom:4px;}
-        .login-sub{font-size:13px;color:#667085;}
+        .login-sub{font-size:13px;color:#667085;margin-bottom:32px;}
         .login-field{margin-bottom:16px;}
         .login-field label{display:block;font-size:13px;font-weight:600;color:#344054;margin-bottom:6px;}
         .login-field input{
@@ -46,15 +48,14 @@
             font-size:14px;font-weight:600;cursor:pointer;
             transition:all .2s;margin-top:8px;
         }
-        .login-btn:hover{background:#0DA15E;box-shadow:0 4px 12px rgba(18,183,106,.3);transform:translateY(-1px);}
-        .login-btn:disabled{background:#D0D5DD;cursor:not-allowed;transform:none;box-shadow:none;}
+        .login-btn:hover{background:#0DA15E;transform:translateY(-1px);}
+        .login-btn:disabled{background:#D0D5DD;cursor:not-allowed;transform:none;}
         .login-error{
             background:#FEF3F2;border:1px solid #FDA29B;border-radius:8px;
             padding:10px 14px;font-size:13px;color:#B42318;
             margin-bottom:16px;display:none;
         }
         .login-footer{text-align:center;margin-top:24px;font-size:12px;color:#98A2B3;}
-        #dashboard-screen{display:none;}
 
         /* ── RESET ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -379,30 +380,6 @@
 
     
 
-<!-- ── TELA DE LOGIN ── -->
-<div id="login-screen">
-    <div class="login-card">
-        <div style="text-align:center;margin-bottom:32px">
-            <div class="login-logo-mark">GO</div>
-            <div class="login-title">Soluti — Painel Executivo</div>
-            <div class="login-sub">Gestão Online — Acesso restrito</div>
-        </div>
-        <div class="login-error" id="login-error">E-mail ou senha incorretos.</div>
-        <div class="login-field">
-            <label>E-mail</label>
-            <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
-        </div>
-        <div class="login-field">
-            <label>Senha</label>
-            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
-        </div>
-        <button class="login-btn" id="login-btn" onclick="doLogin()">Entrar</button>
-        <div class="login-footer">© Gestão Online — Acesso autorizado apenas para usuários cadastrados</div>
-    </div>
-</div>
-
-<!-- ── DASHBOARD ── -->
-<div id="dashboard-screen">
 
 <div class="container">
         <header>
@@ -411,8 +388,7 @@
                 <p>Gestão estratégica de demandas e entregas — Gestão Online</p>
             </div>
             <div class="header-right">
-                <button onclick="doLogout()" style="background:none;border:1px solid #D0D5DD;border-radius:8px;padding:8px 14px;font-size:12px;color:#667085;cursor:pointer;margin-right:8px;font-family:inherit">Sair</button>
-            <button class="btn-refresh" onclick="forceRefresh()">
+                <button class="btn-refresh" onclick="forceRefresh()">
                     <span class="refresh-icon">🔄</span>
                     <span>Sincronizar</span>
                 </button>
@@ -1199,78 +1175,70 @@
         }
     </script>
 
-</div><!-- /dashboard-screen -->
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- ── LOGIN OVERLAY ── -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <div style="text-align:center;margin-bottom:32px">
+                <div class="login-logo-mark">GO</div>
+                <div class="login-title">Soluti — Painel Executivo</div>
+                <div class="login-sub">Gestão Online — Acesso restrito</div>
+            </div>
+            <div class="login-error" id="login-error">Usuário ou senha incorretos.</div>
+            <div class="login-field">
+                <label>E-mail</label>
+                <input type="email" id="login-user" placeholder="seu@email.com" autocomplete="email">
+            </div>
+            <div class="login-field">
+                <label>Senha</label>
+                <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button class="login-btn" id="login-btn" onclick="doLogin()">Entrar</button>
+            <div class="login-footer">© Gestão Online — Acesso autorizado apenas para usuários cadastrados</div>
+        </div>
+    </div>
+
+
     <script>
-        // ── AUTH ──────────────────────────────────────────────────────────
-        const _sbClient = window.supabase.createClient(
-            'https://ikzbjnedlftysizmetko.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlremJqbmVkbGZ0eXNpem1ldGtvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwMjc5MDUsImV4cCI6MjA4OTYwMzkwNX0.MLZMVxYXKScskCuKOuL-m4D1h4oYhUIPbnflz6t-uxY'
-        );
+        // ── LOGIN SIMPLES ─────────────────────────────────────────────────
+        const USUARIOS = {
+            'bruno.camara@gestao-online.com': 'Soluti@2026',
+            'paulo@gestao-online.com': 'Soluti@2026',
+            'nicolau@gestao-online.com': 'Soluti@2026',
+            'matheus.melo@gestao-online.com': 'Soluti@2026',
+            'paulane.batista@soluti.com.br': 'Soluti@2026',
+            'sabrina.sousa@soluti.com.br': 'Soluti@2026'
+        };
 
-        async function checkSession() {
-            const { data: { session } } = await _sbClient.auth.getSession();
-            if (session) showDashboard();
-            else showLogin();
-        }
+        function doLogin() {
+            const user = document.getElementById('login-user').value.trim().toLowerCase();
+            const pass = document.getElementById('login-pass').value;
+            const err  = document.getElementById('login-error');
+            const btn  = document.getElementById('login-btn');
 
-        function showLogin() {
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('dashboard-screen').style.display = 'none';
-        }
-
-        function showDashboard() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard-screen').style.display = 'block';
-            setNow('Gestão Online');
-            applyFilters();
-        }
-
-        async function doLogin() {
-            const email    = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            const btn      = document.getElementById('login-btn');
-            const errBox   = document.getElementById('login-error');
-
-            if (!email || !password) {
-                errBox.textContent = 'Preencha e-mail e senha.';
-                errBox.style.display = 'block';
-                return;
+            if (USUARIOS[user] && USUARIOS[user] === pass) {
+                document.getElementById('login-overlay').style.display = 'none';
+                sessionStorage.setItem('go_auth', '1');
+            } else {
+                err.style.display = 'block';
+                btn.disabled = true;
+                setTimeout(() => { btn.disabled = false; }, 2000);
             }
-
-            btn.disabled = true;
-            btn.textContent = 'Entrando…';
-            errBox.style.display = 'none';
-
-            const { error } = await _sbClient.auth.signInWithPassword({ email, password });
-
-            if (error) {
-                errBox.textContent = 'E-mail ou senha incorretos. Tente novamente.';
-                errBox.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'Entrar';
-                return;
-            }
-
-            showDashboard();
-        }
-
-        async function doLogout() {
-            await _sbClient.auth.signOut();
-            showLogin();
         }
 
         // Enter para logar
         document.addEventListener('keydown', e => {
             if (e.key === 'Enter' &&
-                document.getElementById('login-screen').style.display !== 'none') {
+                document.getElementById('login-overlay').style.display !== 'none') {
                 doLogin();
             }
         });
 
-        // Verificar sessão ao abrir
-        checkSession();
+        // Manter sessão durante a aba aberta
+        if (sessionStorage.getItem('go_auth') === '1') {
+            document.getElementById('login-overlay').style.display = 'none';
+        }
     </script>
 
 </body>
