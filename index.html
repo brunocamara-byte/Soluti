@@ -707,21 +707,75 @@
                 </div>
             </div>
 
-            <!-- TABELA CHAMADOS CONCLUÍDOS -->
-            <div class="section-title" style="margin-top:8px">Chamados Concluídos</div>
-            <div class="tbl-wrap">
-                <table>
-                    <thead><tr>
-                        <th style="white-space:nowrap">Chamado</th>
-                        <th style="min-width:240px">Assunto</th>
-                        <th>Projeto</th>
-                        <th style="white-space:nowrap;text-align:center">Data Ticket</th>
-                        <th style="white-space:nowrap;text-align:center">Data Conclusão</th>
-                        <th style="white-space:nowrap;text-align:center">Horas Faturadas</th>
-                        <th>Status</th>
-                    </tr></thead>
-                    <tbody id="fat-body"></tbody>
-                </table>
+            <!-- TABELAS SEPARADAS POR CONTRATO -->
+            <div id="fat-tables-novo" style="display:none">
+                <!-- E-COMMERCE -->
+                <div style="margin-top:16px">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                        <div style="width:12px;height:12px;border-radius:3px;background:#1A5276"></div>
+                        <span style="font-weight:700;font-size:13px;color:#1A5276">E-COMMERCE — Chamados Concluídos</span>
+                        <span id="fat-ec-count" style="background:#EFF8FF;color:#1D4ED8;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:600">0</span>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead><tr>
+                                <th style="white-space:nowrap">Chamado</th>
+                                <th style="min-width:200px">Assunto</th>
+                                <th>Projeto</th>
+                                <th style="text-align:center">Data Ticket</th>
+                                <th style="text-align:center">Data Conclusão</th>
+                                <th style="text-align:center">Horas Faturadas</th>
+                                <th>Status</th>
+                            </tr></thead>
+                            <tbody id="fat-body-ec"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- SALES OPS -->
+                <div style="margin-top:20px">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                        <div style="width:12px;height:12px;border-radius:3px;background:#1E8449"></div>
+                        <span style="font-weight:700;font-size:13px;color:#1E8449">SALES OPS — Chamados Concluídos</span>
+                        <span id="fat-sl-count" style="background:#ECFDF3;color:#027A48;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:600">0</span>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead><tr>
+                                <th style="white-space:nowrap">Chamado</th>
+                                <th style="min-width:200px">Assunto</th>
+                                <th>Projeto</th>
+                                <th style="text-align:center">Data Ticket</th>
+                                <th style="text-align:center">Data Conclusão</th>
+                                <th style="text-align:center">Horas Faturadas</th>
+                                <th>Status</th>
+                            </tr></thead>
+                            <tbody id="fat-body-sl"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABELA ÚNICA (regime antigo) -->
+            <div id="fat-tables-antigo" style="display:none;margin-top:16px">
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+                    <div style="width:12px;height:12px;border-radius:3px;background:#1A5276"></div>
+                    <span style="font-weight:700;font-size:13px;color:#344054">Todos os Projetos — Chamados Concluídos</span>
+                    <span id="fat-uni-count" style="background:#F9FAFB;color:#344054;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:600">0</span>
+                </div>
+                <div class="tbl-wrap">
+                    <table>
+                        <thead><tr>
+                            <th style="white-space:nowrap">Chamado</th>
+                            <th style="min-width:200px">Assunto</th>
+                            <th>Projeto</th>
+                            <th style="text-align:center">Data Ticket</th>
+                            <th style="text-align:center">Data Conclusão</th>
+                            <th style="text-align:center">Horas Faturadas</th>
+                            <th>Status</th>
+                        </tr></thead>
+                        <tbody id="fat-body"></tbody>
+                    </table>
+                </div>
             </div>
             <div style="background:#EFF8FF;border:1px solid #B2DDFF;border-radius:10px;padding:14px 18px;margin:12px 0;display:flex;align-items:flex-start;gap:12px">
                 <span style="font-size:18px;flex-shrink:0">ℹ️</span>
@@ -1144,27 +1198,46 @@
                 updateCard('fat-sl-used','fat-sl-rest','fat-sl-rest-card','fat-sl-exc','fat-sl-exc-card','fat-sl-sem','fat-sl-dem',usedSl,60,concSl.length);
             }
 
-            // Tabela chamados concluídos
-            const tbody = document.querySelector('#faturamento table tbody');
-            if (!tbody) return;
-            if (!conc.length) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text4);padding:28px">Nenhum chamado concluído no período selecionado.</td></tr>';
-                return;
+            // ── Tabelas separadas por contrato ─────────────────────
+            const fatNovo = document.getElementById('fat-tables-novo');
+            const fatAntigo = document.getElementById('fat-tables-antigo');
+            if (fatNovo) fatNovo.style.display = isRegimeNovo() ? 'block' : 'none';
+            if (fatAntigo) fatAntigo.style.display = isRegimeNovo() ? 'none' : 'block';
+
+            function buildRows(list) {
+                if (!list.length) return '<tr><td colspan="7" style="text-align:center;color:var(--text4);padding:20px;font-size:13px">Nenhum chamado concluído neste contrato no período.</td></tr>';
+                return list.map(r => {
+                    const dt      = r.data      ? r.data.split('-').reverse().join('/')      : '—';
+                    const dt_conc = r.data_conc ? r.data_conc.split('-').reverse().join('/') : '—';
+                    return '<tr>' +
+                        '<td style="white-space:nowrap">' + (r.chamado ? '<span class="chamado-tag">'+r.chamado+'</span>' : '<span style="color:var(--text4)">—</span>') + '</td>' +
+                        '<td style="min-width:200px;max-width:340px"><div style="color:var(--text2);line-height:1.45;font-size:13px">' + r.assunto + '</div></td>' +
+                        '<td style="white-space:nowrap"><span style="background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--text2)">' + r.projeto + '</span></td>' +
+                        '<td style="font-size:12px;color:var(--text3);white-space:nowrap;text-align:center">' + dt + '</td>' +
+                        '<td style="font-size:12px;white-space:nowrap;text-align:center">' + (dt_conc !== '—' ? '<span style="color:var(--green-d);font-weight:600">'+dt_conc+'</span>' : '<span style="color:var(--text4);font-size:11px">—</span>') + '</td>' +
+                        '<td style="text-align:center;font-size:12px;font-weight:600;color:var(--green-d)">' + (r.hrs_real ? r.hrs_real+'h' : '—') + '</td>' +
+                        '<td><span class="badge badge-baixa">Concluída</span></td>' +
+                        '</tr>';
+                }).join('');
             }
 
-            tbody.innerHTML = conc.map(r => {
-                const dt      = r.data      ? r.data.split('-').reverse().join('/')      : '—';
-                const dt_conc = r.data_conc ? r.data_conc.split('-').reverse().join('/') : '—';
-                return `<tr>
-                    <td style="white-space:nowrap">${r.chamado ? `<span class="chamado-tag">${r.chamado}</span>` : '<span style="color:var(--text4)">—</span>'}</td>
-                    <td style="min-width:240px;max-width:360px"><div style="color:var(--text2);line-height:1.45;font-size:13px">${r.assunto}</div></td>
-                    <td style="white-space:nowrap"><span style="background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--text2)">${r.projeto}</span></td>
-                    <td style="font-size:12px;color:var(--text3);white-space:nowrap;text-align:center">${dt}</td>
-                    <td style="font-size:12px;white-space:nowrap;text-align:center">${dt_conc !== '—' ? `<span style="color:var(--green-d);font-weight:600">${dt_conc}</span>` : '<span style="color:var(--text4);font-size:11px">—</span>'}</td>
-                    <td style="text-align:center;font-size:12px;font-weight:600;color:var(--green-d)">${r.hrs_real ? r.hrs_real+'h' : '—'}</td>
-                    <td><span class="badge badge-baixa">Concluída</span></td>
-                </tr>`;
-            }).join('');
+            if (isRegimeNovo()) {
+                const concEc = conc.filter(r => (r.contrato || r.projeto) === 'Ecommerce');
+                const concSl = conc.filter(r => (r.contrato || r.projeto) === 'Sales Ops');
+                const bEc = document.getElementById('fat-body-ec');
+                const bSl = document.getElementById('fat-body-sl');
+                const cEc = document.getElementById('fat-ec-count');
+                const cSl = document.getElementById('fat-sl-count');
+                if (bEc) bEc.innerHTML = buildRows(concEc);
+                if (bSl) bSl.innerHTML = buildRows(concSl);
+                if (cEc) cEc.textContent = concEc.length;
+                if (cSl) cSl.textContent = concSl.length;
+            } else {
+                const tbody = document.getElementById('fat-body');
+                const cUni = document.getElementById('fat-uni-count');
+                if (tbody) tbody.innerHTML = buildRows(conc);
+                if (cUni) cUni.textContent = conc.length;
+            }
         }
 
         // ── UTILS ─────────────────────────────────────────────────────────
