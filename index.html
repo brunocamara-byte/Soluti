@@ -519,6 +519,7 @@
                         <th>Assunto</th>
                         <th>Status</th>
                         <th>Projeto</th>
+                        <th>Contrato</th>
                         <th style="white-space:nowrap">Horas Estimadas</th>
                     </tr>
                 </thead>
@@ -700,7 +701,7 @@
 
     <script>
         // ── CONFIG ────────────────────────────────────────────────────────
-        const PIPELINE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTzhjG15AHNuMPoznaorLr8bYCqBH_gh9X4nvkweJdl19luHeBGarpy0iv7jiOyoXBzasR2p4mmbRHF/pub?gid=963776579&single=true&output=csv';
+        const PIPELINE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGhGe882peQ51ywPJc6zXFvW8Z2cReBxm6hXPXVLen_4yDTvVdHUZEw9GdnDwt--1J9JRg5oKTVtP9/pub?gid=189444658&single=true&output=csv';
 
         const STATUS_CLASS = {
             'Concluída':'s-conc','Execução':'s-exec','Backlog':'s-back',
@@ -741,13 +742,14 @@
                 const status   = (cols[4] || 'Backlog').trim();
                 const equipe   = (cols[5] || '').trim();
                 const projeto  = (cols[6] || '').trim();
-                const hrs_est  = parseFloat(cols[7]) || 0;
-                const hrs_real = parseFloat(cols[8]) || 0;
-                const data_conc = parseDate(cols[9]);
+                const contrato = (cols[7] || '').trim(); // nova coluna H
+                const hrs_est  = parseFloat(cols[8]) || 0;  // col I
+                const hrs_real = parseFloat(cols[9]) || 0;  // col J
+                const data_conc = parseDate(cols[10]);       // col K
 
                 if (!chamado && !assunto) continue; // pula linhas completamente vazias
 
-                records.push({ id, chamado, assunto, data, status, equipe, projeto, hrs_est, hrs_real, data_conc });
+                records.push({ id, chamado, assunto, data, status, equipe, projeto, contrato, hrs_est, hrs_real, data_conc });
             }
             return records;
         }
@@ -945,7 +947,7 @@
             const tbody = document.querySelector('#pipeline table tbody');
             if (!tbody) return;
             if (!f.length) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text4);padding:28px">Nenhum resultado encontrado.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text4);padding:28px">Nenhum resultado encontrado.</td></tr>';
                 return;
             }
             tbody.innerHTML = f.map(r => {
@@ -958,6 +960,7 @@
                     <td><div style="max-width:340px;line-height:1.4">${hlText(r.assunto, s)}</div></td>
                     <td><span class="badge badge-${r.status==='Concluída'?'baixa':r.status==='Bloqueada'?'alta':'media'}">${r.status}</span></td>
                     <td><span style="background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--text2)">${r.projeto}</span></td>
+                    <td style="font-size:11px;color:var(--text3)">${r.contrato ? `<span style="background:#EFF8FF;color:#1D4ED8;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600">${r.contrato}</span>` : '—'}</td>
                     <td style="text-align:center;font-size:12px;color:var(--text2)">${r.hrs_est ? r.hrs_est+'h' : '—'}</td>
                 </tr>`;
             }).join('');
@@ -1081,9 +1084,10 @@
                 updateCard('fat-uni-used','fat-uni-rest','fat-uni-rest-card','fat-uni-exc','fat-uni-exc-card',null,'fat-uni-dem',used,40,conc.length);
             } else {
                 // REGIME NOVO: Ecommerce 40h + Sales Ops 60h
-                // conc já está filtrado por data_conc + mês/ano
-                const concEc = conc.filter(r => r.projeto === 'Ecommerce');
-                const concSl = conc.filter(r => r.projeto === 'Sales Ops');
+                // Agrupa por CONTRATO (não por Projeto) — rastreabilidade mantida
+                // Se contrato preenchido usa ele, senão fallback para projeto
+                const concEc = conc.filter(r => (r.contrato || r.projeto) === 'Ecommerce');
+                const concSl = conc.filter(r => (r.contrato || r.projeto) === 'Sales Ops');
                 const usedEc = concEc.reduce((a,r) => a+r.hrs_real, 0);
                 const usedSl = concSl.reduce((a,r) => a+r.hrs_real, 0);
                 updateCard('fat-ec-used','fat-ec-rest','fat-ec-rest-card','fat-ec-exc','fat-ec-exc-card','fat-ec-sem','fat-ec-dem',usedEc,40,concEc.length);
