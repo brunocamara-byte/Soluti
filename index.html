@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soluti — Painel Executivo de Projetos</title>
+    <title>Soluti Painel Executivo de Projetos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
 
@@ -384,8 +384,8 @@
 <div class="container">
         <header>
             <div class="header-left">
-                <h1>Soluti — Painel Executivo de Projetos</h1>
-                <p>Gestão estratégica de demandas e entregas — Gestão Online</p>
+                <h1>Soluti - Painel Executivo de Projetos</h1>
+                <p>Gestão estratégica de demandas e entregas - Gestão Online</p>
             </div>
             <div class="header-right">
                 <button onclick="doLogout()" style="background:none;border:1px solid #D0D5DD;border-radius:8px;padding:8px 14px;font-size:12px;color:#667085;cursor:pointer;margin-right:8px;font-family:inherit">Sair</button>
@@ -795,7 +795,7 @@
     </div>
 
 <div class="footer">
-        © Gestão Online — Todos os direitos reservados
+        © Gestão.Online Soluções em TI LTDA. Todos os direitos reservados.
     </div>
 
     
@@ -906,7 +906,7 @@
                 const parsed = parseCSV(text);
                 if (parsed.length === 0) throw new Error('Nenhum registro');
                 ALL_RECORDS = parsed;
-                setNow('Sincronizado — Gestão Online');
+                setNow('Sincronizado - Gestão Online');
                 if (showFeedback && btn) {
                     btn.innerHTML = '<span>✅</span><span>Atualizado — Gestão Online</span>';
                     setTimeout(() => { btn.innerHTML = orig; }, 2500);
@@ -1256,8 +1256,8 @@
         <div class="login-card">
             <div style="text-align:center;margin-bottom:32px">
                 <div class="login-logo-mark">GO</div>
-                <div class="login-title">Soluti — Painel Executivo</div>
-                <div class="login-sub">Gestão Online — Acesso restrito</div>
+                <div class="login-title">Soluti - Painel Executivo</div>
+                <div class="login-sub">Gestão Online - Acesso restrito</div>
             </div>
             <div class="login-error" id="login-error">Usuário ou senha incorretos.</div>
             <div class="login-field">
@@ -1269,7 +1269,7 @@
                 <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
             </div>
             <button class="login-btn" id="login-btn" onclick="doLogin()">Entrar</button>
-            <div class="login-footer">© Gestão Online — Acesso autorizado apenas para usuários cadastrados</div>
+            <div class="login-footer">© Gestão Online - Acesso autorizado apenas para usuários cadastrados</div>
         </div>
     </div>
 
