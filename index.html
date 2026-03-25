@@ -1325,6 +1325,9 @@
         function doLogout() {
             clearTimeout(_timer);
             sessionStorage.removeItem('go_auth');
+            // Resetar botão para estado original
+            const btn = document.getElementById('login-btn');
+            if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
             document.getElementById('login-overlay').style.display = 'flex';
             document.getElementById('login-user').value = '';
             document.getElementById('login-pass').value = '';
