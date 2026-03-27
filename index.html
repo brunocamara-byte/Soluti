@@ -1042,6 +1042,14 @@
 
         // ── PIPELINE TABLE ────────────────────────────────────────────────
         function renderPipeline(f) {
+            // Título dinâmico
+            const pipTitle = document.getElementById('pipeline-title');
+            if (pipTitle) {
+                const meses = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                const mesLabel = activeMes !== 'all' ? ' - ' + meses[parseInt(activeMes)] : '';
+                const anoLabel = activeAno !== 'all' ? ' ' + activeAno : '';
+                pipTitle.textContent = 'Pipeline de Demandas' + mesLabel + anoLabel;
+            }
             const s = activeSearch.toLowerCase().trim();
             const info = document.getElementById('search-info');
             if (info) info.innerHTML = s
