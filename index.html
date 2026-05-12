@@ -1157,11 +1157,24 @@
         }
 
         function updateKPIs(f) {
-            const q = (cls) => document.querySelector('.kpi-card.' + cls + ' .kpi-value');
-            if (q('info'))    q('info').textContent    = f.length;
-            if (q('success')) q('success').textContent = f.filter(r=>r.status==='Concluída').length;
-            if (q('warning')) q('warning').textContent = f.filter(r=>r.status==='Execução').length;
-            if (q('danger'))  q('danger').textContent  = f.filter(r=>r.status==='Bloqueada').length;
+            const q    = (cls) => document.querySelector('.kpi-card.' + cls + ' .kpi-value');
+            const card = (cls) => document.querySelector('.kpi-card.' + cls);
+            const total      = f.length;
+            const concluidas = f.filter(r=>r.status==='Concluída').length;
+            const execucao   = f.filter(r=>r.status==='Execução').length;
+            const bloqueadas = f.filter(r=>r.status==='Bloqueada').length;
+
+            if (q('info'))    animateCount(q('info'),    total);
+            if (q('success')) animateCount(q('success'), concluidas);
+            if (q('warning')) animateCount(q('warning'), execucao);
+            if (q('danger'))  animateCount(q('danger'),  bloqueadas);
+
+            // Pulso no card de Bloqueadas
+            const bloqCard = card('danger');
+            if (bloqCard) {
+                if (bloqueadas > 0) bloqCard.classList.add('pulse-alert');
+                else bloqCard.classList.remove('pulse-alert');
+            }
         }
 
         // ── KANBAN ────────────────────────────────────────────────────────
@@ -1178,11 +1191,14 @@
                     col.innerHTML += `<div style="color:#94A3B8;font-size:11px;text-align:center;padding:20px 0">—</div>`;
                 } else {
                     items.slice(0, 8).forEach(r => {
-                        col.innerHTML += `<div class="card" onclick="abrirModal('${r.id}')" style="cursor:pointer" title="Ver detalhes">
-                            <div class="card-id">${r.chamado || r.id}</div>
+                        col.innerHTML += `<div class="card" onclick="abrirModal('${r.id}')" style="cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+                                <div class="card-id">${r.chamado || r.id}</div>
+                                ${r.equipe ? `<div style="font-size:9px;color:#6b7280;background:#f3f4f6;border-radius:4px;padding:1px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px">${r.equipe.split(' ')[0]}</div>` : ''}
+                            </div>
                             <div class="card-project">${r.projeto}</div>
-                            <div class="card-title">${r.assunto.slice(0,55)}${r.assunto.length>55?'…':''}</div>
-                            ${r.hrs_est ? `<div style="font-size:10px;color:#6b7280;margin-top:3px">⏱ ${r.hrs_est}h est.</div>` : ''}
+                            <div class="card-title">${r.assunto.slice(0,60)}${r.assunto.length>60?'…':''}</div>
+                            ${r.hrs_est ? `<div style="font-size:10px;color:#6b7280;margin-top:4px">⏱ ${r.hrs_est}h est.</div>` : ''}
                         </div>`;
                     });
                     if (items.length > 8)
