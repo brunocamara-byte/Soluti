@@ -157,15 +157,15 @@
 
         /* ── TOAST SYNC ── */
         #toast-sync {
-            position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+            position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
             background:#1e293b;color:#fff;
             padding:12px 20px;border-radius:10px;
             font-size:13px;font-weight:500;
             box-shadow:0 8px 24px rgba(0,0,0,.25);
-            z-index:2000;display:none;align-items:center;gap:10px;
-            animation:slideUp .3s ease;
+            z-index:10000;display:none;align-items:center;gap:10px;
+            animation:slideUp .3s ease;white-space:nowrap;
         }
-        #toast-sync.show { display:flex; }
+        #toast-sync.show { display:flex !important; }
         #toast-sync button {
             background:#12B76A;border:none;color:#fff;
             padding:5px 12px;border-radius:6px;
@@ -1691,8 +1691,12 @@
                     // Aviso para sincronizar
                     const toast = document.getElementById('toast-sync');
                     if (toast) {
+                        toast.style.display = 'flex';
                         toast.classList.add('show');
-                        setTimeout(() => toast.classList.remove('show'), 8000);
+                        setTimeout(() => {
+                            toast.classList.remove('show');
+                            toast.style.display = 'none';
+                        }, 8000);
                     }
                 }, 50);
             }
@@ -1701,9 +1705,7 @@
         // ── PERFIL GO vs CLIENTE ─────────────────────────────────────────
         function togglePerfilGO(isGO) {
             const btnPDF = document.getElementById('btn-pdf-go');
-            if (btnPDF) {
-                btnPDF.style.display = isGO ? 'flex' : 'none';
-            }
+            if (btnPDF) btnPDF.style.display = isGO ? 'flex' : 'none';
         }
 
         // ── GERAR RELATÓRIO PDF (jsPDF) ──────────────────────────────────
@@ -1863,12 +1865,15 @@
             });
 
             if (novo) {
-                const concEc = conc.filter(r => (r.contrato||r.projeto) === 'Ecommerce');
-                const concSl = conc.filter(r => (r.contrato||r.projeto) === 'Sales Ops');
-                const hEc = concEc.reduce((a,r)=>a+r.hrs_real,0);
-                const hSl = concSl.reduce((a,r)=>a+r.hrs_real,0);
-                blocoContrato('E-COMMERCE - 40h/mês', verdeClaro, concEc.length, hEc, 40, concEc);
-                blocoContrato('SALES OPS - 60h/mês', verde, concSl.length, hSl, 60, concSl);
+                if (contratoFiltro === 'Ecommerce') {
+                    const concEc = conc.filter(r => (r.contrato||r.projeto) === 'Ecommerce');
+                    const hEc = concEc.reduce((a,r)=>a+r.hrs_real,0);
+                    blocoContrato('E-COMMERCE - 40h/mes', verdeClaro, concEc.length, hEc, 40, concEc);
+                } else if (contratoFiltro === 'Sales Ops') {
+                    const concSl = conc.filter(r => (r.contrato||r.projeto) === 'Sales Ops');
+                    const hSl = concSl.reduce((a,r)=>a+r.hrs_real,0);
+                    blocoContrato('SALES OPS - 60h/mes', verde, concSl.length, hSl, 60, concSl);
+                }
             } else {
                 const h = conc.reduce((a,r)=>a+r.hrs_real,0);
                 blocoContrato('CONTRATO ÚNICO - 40h/mês', verde, conc.length, h, 40, conc);
