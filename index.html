@@ -332,12 +332,12 @@
             border: 1px solid #E4E7EC;
             min-height: 280px; transition: box-shadow .2s;
         }
-        /* Colunas neutras — não precisam de ação */
+        /* Colunas neutras - não precisam de ação */
         .kanban-column.backlog      { border-top: 3px solid #9CA3AF; }
         .kanban-column.analise-tec  { border-top: 3px solid #9CA3AF; }
         .kanban-column.ag-aprovacao { border-top: 3px solid #9CA3AF; }
         .kanban-column.concluida    { border-top: 3px solid #9CA3AF; }
-        /* Colunas de ação — chamam atenção */
+        /* Colunas de ação - chamam atenção */
         .kanban-column.execucao {
             background: #EFF6FF;
             border: 1px solid #BFDBFE;
@@ -768,9 +768,14 @@
         <div id="faturamento" class="tab-content">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
                 <div class="section-title" style="margin-bottom:0">Faturamento</div>
-                <button id="btn-pdf-go" onclick="gerarRelatorioPDF()" style="display:none;background:#006837;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;gap:6px;align-items:center" title="Apenas equipe Gestão Online">
-                    📄 Gerar Relatório PDF
-                </button>
+<div id="btn-pdf-go" style="display:none;gap:8px;align-items:center">
+                    <button onclick="gerarRelatorioPDF('Ecommerce')" style="background:#1A5276;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">
+                        📄 PDF Ecommerce
+                    </button>
+                    <button onclick="gerarRelatorioPDF('Sales Ops')" style="background:#1E8449;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer">
+                        📄 PDF Sales Ops
+                    </button>
+                </div>
             </div>
 
             <!-- REGIME ANTIGO: antes de Out/2025 -->
@@ -779,11 +784,11 @@
                     📋 <strong>Contrato Único - 40h/mês</strong> - Período anterior a Outubro/2025. Todos os projetos somados.
                 </div>
                 <div class="faturamento-summary" style="grid-template-columns:repeat(4,1fr)">
-                    <div class="summary-card"><div class="label">Demandas</div><div class="value" id="fat-uni-dem">—</div></div>
+                    <div class="summary-card"><div class="label">Demandas</div><div class="value" id="fat-uni-dem">-</div></div>
                     <div class="summary-card"><div class="label">Contrato Mensal</div><div class="value">40h</div></div>
-                    <div class="summary-card"><div class="label">Horas Utilizadas</div><div class="value" id="fat-uni-used">—</div></div>
-                    <div class="summary-card" id="fat-uni-rest-card"><div class="label">Horas Restantes</div><div class="value" id="fat-uni-rest">—</div></div>
-                    <div class="summary-card" id="fat-uni-exc-card" style="display:none;border-left-color:var(--red)"><div class="label" style="color:var(--red-d)">⚠️ Excedente</div><div class="value" id="fat-uni-exc" style="color:var(--red-d)">—</div></div>
+                    <div class="summary-card"><div class="label">Horas Utilizadas</div><div class="value" id="fat-uni-used">-</div></div>
+                    <div class="summary-card" id="fat-uni-rest-card"><div class="label">Horas Restantes</div><div class="value" id="fat-uni-rest">-</div></div>
+                    <div class="summary-card" id="fat-uni-exc-card" style="display:none;border-left-color:var(--red)"><div class="label" style="color:var(--red-d)">⚠️ Excedente</div><div class="value" id="fat-uni-exc" style="color:var(--red-d)">-</div></div>
                 </div>
             </div>
 
@@ -797,28 +802,28 @@
                     <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
                         <div style="background:#1A5276;color:#fff;padding:10px 16px;font-size:12px;font-weight:700">📦 E-COMMERCE - 40h/mês</div>
                         <div class="faturamento-summary" style="grid-template-columns:repeat(3,1fr);border:none">
-                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Demandas</div><div class="value" id="fat-ec-dem">—</div></div>
-                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Horas Utilizadas</div><div class="value" id="fat-ec-used">—</div></div>
-                            <div class="summary-card" style="border:none;border-radius:0" id="fat-ec-rest-card"><div class="label">Horas Restantes</div><div class="value" id="fat-ec-rest">—</div></div>
+                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Demandas</div><div class="value" id="fat-ec-dem">-</div></div>
+                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Horas Utilizadas</div><div class="value" id="fat-ec-used">-</div></div>
+                            <div class="summary-card" style="border:none;border-radius:0" id="fat-ec-rest-card"><div class="label">Horas Restantes</div><div class="value" id="fat-ec-rest">-</div></div>
                         </div>
-                        <div id="fat-ec-sem" style="padding:10px 16px;font-size:12px;font-weight:600;text-align:center;border-top:1px solid var(--border)">—</div>
+                        <div id="fat-ec-sem" style="padding:10px 16px;font-size:12px;font-weight:600;text-align:center;border-top:1px solid var(--border)">-</div>
                         <div id="fat-ec-exc-card" style="display:none;padding:10px 16px;background:var(--red-l);border-top:1px solid var(--border)">
                             <div style="font-size:11px;color:var(--red-d);font-weight:600">⚠️ Excedente</div>
-                            <div id="fat-ec-exc" style="font-size:22px;font-weight:700;color:var(--red-d)">—</div>
+                            <div id="fat-ec-exc" style="font-size:22px;font-weight:700;color:var(--red-d)">-</div>
                         </div>
                     </div>
                     <!-- Sales Ops -->
                     <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
                         <div style="background:#1E8449;color:#fff;padding:10px 16px;font-size:12px;font-weight:700">📦 SALES OPS - 60h/mês</div>
                         <div class="faturamento-summary" style="grid-template-columns:repeat(3,1fr);border:none">
-                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Demandas</div><div class="value" id="fat-sl-dem">—</div></div>
-                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Horas Utilizadas</div><div class="value" id="fat-sl-used">—</div></div>
-                            <div class="summary-card" style="border:none;border-radius:0" id="fat-sl-rest-card"><div class="label">Horas Restantes</div><div class="value" id="fat-sl-rest">—</div></div>
+                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Demandas</div><div class="value" id="fat-sl-dem">-</div></div>
+                            <div class="summary-card" style="border:none;border-right:1px solid var(--border);border-radius:0"><div class="label">Horas Utilizadas</div><div class="value" id="fat-sl-used">-</div></div>
+                            <div class="summary-card" style="border:none;border-radius:0" id="fat-sl-rest-card"><div class="label">Horas Restantes</div><div class="value" id="fat-sl-rest">-</div></div>
                         </div>
-                        <div id="fat-sl-sem" style="padding:10px 16px;font-size:12px;font-weight:600;text-align:center;border-top:1px solid var(--border)">—</div>
+                        <div id="fat-sl-sem" style="padding:10px 16px;font-size:12px;font-weight:600;text-align:center;border-top:1px solid var(--border)">-</div>
                         <div id="fat-sl-exc-card" style="display:none;padding:10px 16px;background:var(--red-l);border-top:1px solid var(--border)">
                             <div style="font-size:11px;color:var(--red-d);font-weight:600">⚠️ Excedente</div>
-                            <div id="fat-sl-exc" style="font-size:22px;font-weight:700;color:var(--red-d)">—</div>
+                            <div id="fat-sl-exc" style="font-size:22px;font-weight:700;color:var(--red-d)">-</div>
                         </div>
                     </div>
                 </div>
@@ -932,7 +937,7 @@
                 <div class="modal-label">Assunto</div>
                 <div style="font-size:14px;color:#101828;font-weight:500;line-height:1.5" id="modal-assunto-full">-</div>
             </div>
-            <!-- Resumo do Chamado — destaque igual ao Save -->
+            <!-- Resumo do Chamado - destaque igual ao Save -->
             <div id="modal-resumo-wrap" style="display:none;margin-bottom:16px">
                 <div class="modal-label">Resumo do Chamado</div>
                 <div class="modal-desc" id="modal-resumo"></div>
@@ -1241,7 +1246,7 @@
                 col.className = `kanban-column ${cls}`;
                 col.innerHTML = `<h3>${label} <span class="count">${items.length}</span></h3>`;
                 if (!items.length) {
-                    col.innerHTML += `<div style="color:#94A3B8;font-size:11px;text-align:center;padding:20px 0">—</div>`;
+                    col.innerHTML += `<div style="color:#94A3B8;font-size:11px;text-align:center;padding:20px 0">-</div>`;
                 } else {
                     items.slice(0, 8).forEach(r => {
                         col.innerHTML += `<div class="card" onclick="abrirModal('${r.id}')" onmouseenter="showTooltip(event,'${r.id}')" onmouseleave="hideTooltip()" style="cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
@@ -1289,16 +1294,16 @@
             }
             tbody.innerHTML = f.map(r => {
                 const pc = STATUS_CLASS[r.status] || 's-back';
-                const dt = r.data ? r.data.split('-').reverse().join('/') : '—';
+                const dt = r.data ? r.data.split('-').reverse().join('/') : '-';
                 const isMatch = s && (r.chamado.toLowerCase().includes(s) || r.assunto.toLowerCase().includes(s));
                 return `<tr class="${isMatch?'srch-match':''}">
-                    <td>${r.chamado ? `<span class="chamado-tag">${r.chamado}</span>` : '<span style="color:var(--text4)">—</span>'}</td>
+                    <td>${r.chamado ? `<span class="chamado-tag">${r.chamado}</span>` : '<span style="color:var(--text4)">-</span>'}</td>
                     <td style="white-space:nowrap;font-size:12px;color:var(--text3)">${dt}</td>
                     <td><div style="max-width:340px;line-height:1.4">${hlText(r.assunto, s)}</div></td>
                     <td><span class="badge badge-${r.status==='Concluída'?'baixa':r.status==='Bloqueada'?'alta':'media'}">${r.status}</span></td>
                     <td><span style="background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--text2)">${r.projeto}</span></td>
-                    <td style="font-size:11px;color:var(--text3)">${r.contrato ? `<span style="background:#EFF8FF;color:#1D4ED8;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600">${r.contrato}</span>` : '—'}</td>
-                    <td style="text-align:center;font-size:12px;color:var(--text2)">${r.hrs_est ? r.hrs_est+'h' : '—'}</td>
+                    <td style="font-size:11px;color:var(--text3)">${r.contrato ? `<span style="background:#EFF8FF;color:#1D4ED8;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600">${r.contrato}</span>` : '-'}</td>
+                    <td style="text-align:center;font-size:12px;color:var(--text2)">${r.hrs_est ? r.hrs_est+'h' : '-'}</td>
                 </tr>`;
             }).join('');
         }
@@ -1328,7 +1333,7 @@
                     return `<tr>
                         <td>${p}</td>
                         <td>${pr.length}</td>
-                        <td>${pr.reduce((a,r)=>a+r.hrs_est,0)||'—'}</td>
+                        <td>${pr.reduce((a,r)=>a+r.hrs_est,0)||'-'}</td>
                         <td style="color:#22c55e">${pr.filter(r=>r.status==='Concluída').length}</td>
                         <td style="color:#f59e0b">${pr.filter(r=>r.status==='Execução').length}</td>
                         <td style="color:#ef4444">${pr.filter(r=>r.status==='Bloqueada').length}</td>
@@ -1443,15 +1448,15 @@
             function buildRows(list) {
                 if (!list.length) return '<tr><td colspan="7" style="text-align:center;color:var(--text4);padding:20px;font-size:13px">Nenhum chamado concluído neste contrato no período.</td></tr>';
                 return list.map(r => {
-                    const dt      = r.data      ? r.data.split('-').reverse().join('/')      : '—';
-                    const dt_conc = r.data_conc ? r.data_conc.split('-').reverse().join('/') : '—';
+                    const dt      = r.data      ? r.data.split('-').reverse().join('/')      : '-';
+                    const dt_conc = r.data_conc ? r.data_conc.split('-').reverse().join('/') : '-';
                     return '<tr>' +
-                        '<td style="white-space:nowrap">' + (r.chamado ? '<span class="chamado-tag">'+r.chamado+'</span>' : '<span style="color:var(--text4)">—</span>') + '</td>' +
+                        '<td style="white-space:nowrap">' + (r.chamado ? '<span class="chamado-tag">'+r.chamado+'</span>' : '<span style="color:var(--text4)">-</span>') + '</td>' +
                         '<td style="min-width:200px;max-width:340px"><div style="color:var(--text2);line-height:1.45;font-size:13px">' + r.assunto + '</div></td>' +
                         '<td style="white-space:nowrap"><span style="background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:11px;color:var(--text2)">' + r.projeto + '</span></td>' +
                         '<td style="font-size:12px;color:var(--text3);white-space:nowrap;text-align:center">' + dt + '</td>' +
-                        '<td style="font-size:12px;white-space:nowrap;text-align:center">' + (dt_conc !== '—' ? '<span style="color:var(--green-d);font-weight:600">'+dt_conc+'</span>' : '<span style="color:var(--text4);font-size:11px">—</span>') + '</td>' +
-                        '<td style="text-align:center;font-size:12px;font-weight:600;color:var(--green-d)">' + (r.hrs_real ? r.hrs_real+'h' : '—') + '</td>' +
+                        '<td style="font-size:12px;white-space:nowrap;text-align:center">' + (dt_conc !== '-' ? '<span style="color:var(--green-d);font-weight:600">'+dt_conc+'</span>' : '<span style="color:var(--text4);font-size:11px">-</span>') + '</td>' +
+                        '<td style="text-align:center;font-size:12px;font-weight:600;color:var(--green-d)">' + (r.hrs_real ? r.hrs_real+'h' : '-') + '</td>' +
                         '<td><span class="badge badge-baixa">Concluída</span></td>' +
                         '</tr>';
                 }).join('');
@@ -1494,7 +1499,7 @@
             if (!r) return;
             clearTimeout(_ttTimer);
             _ttTimer = setTimeout(() => {
-                const dt = r.data ? r.data.split('-').reverse().join('/') : '—';
+                const dt = r.data ? r.data.split('-').reverse().join('/') : '-';
                 _tt.innerHTML = `
                     <div class="card-tooltip-row"><div class="card-tooltip-label">Chamado</div><div class="card-tooltip-val">${r.chamado || r.id}</div></div>
                     <div class="card-tooltip-row"><div class="card-tooltip-label">Assunto</div><div class="card-tooltip-val">${r.assunto}</div></div>
@@ -1541,17 +1546,17 @@
             const assuntoFull = document.getElementById('modal-assunto-full');
             if (assuntoFull) assuntoFull.textContent = r.assunto;
             document.getElementById('modal-status').innerHTML    = `<span class="modal-status-badge" style="background:${color}15;color:${color}">${r.status}</span>`;
-            document.getElementById('modal-projeto').textContent = r.projeto || '—';
-            document.getElementById('modal-contrato').textContent = r.contrato || '—';
-            document.getElementById('modal-equipe').textContent  = r.equipe || '—';
-            document.getElementById('modal-data').textContent    = r.data ? r.data.split('-').reverse().join('/') : '—';
+            document.getElementById('modal-projeto').textContent = r.projeto || '-';
+            document.getElementById('modal-contrato').textContent = r.contrato || '-';
+            document.getElementById('modal-equipe').textContent  = r.equipe || '-';
+            document.getElementById('modal-data').textContent    = r.data ? r.data.split('-').reverse().join('/') : '-';
             document.getElementById('modal-data-conc').innerHTML = r.data_conc
                 ? `<span style="color:#027A48;font-weight:600">${r.data_conc.split('-').reverse().join('/')}</span>`
                 : '<span style="color:#94A3B8">Não preenchida</span>';
-            document.getElementById('modal-hrs-est').textContent  = r.hrs_est  ? r.hrs_est  + 'h' : '—';
-            document.getElementById('modal-hrs-real').textContent = r.hrs_real ? r.hrs_real + 'h' : '—';
+            document.getElementById('modal-hrs-est').textContent  = r.hrs_est  ? r.hrs_est  + 'h' : '-';
+            document.getElementById('modal-hrs-real').textContent = r.hrs_real ? r.hrs_real + 'h' : '-';
 
-            // Resumo — só aparece se preenchido
+            // Resumo - só aparece se preenchido
             const resumoWrap = document.getElementById('modal-resumo-wrap');
             const resumoEl   = document.getElementById('modal-resumo');
             if (resumoWrap && resumoEl) {
@@ -1590,7 +1595,7 @@
         }
 
         // ── FADE LOGIN -> DASHBOARD ───────────────────────────────────────
-        // Já temos o delay — só garante a classe fade
+        // Já temos o delay - só garante a classe fade
         function showDashboardWithFade() {
             const dash = document.getElementById('dashboard-screen');
             if (dash) {
@@ -1599,8 +1604,8 @@
                 setTimeout(() => {
                     setNow('Gestão Online');
                     applyFilters();
-                    // Auto-sync ao abrir — sempre busca dados frescos
-                    setTimeout(() => forceRefresh(), 1500);
+                    // Auto-sync ao abrir
+                    setTimeout(() => syncData(true), 2000);
                 }, 50);
             }
         }
@@ -1614,7 +1619,7 @@
         }
 
         // ── GERAR RELATÓRIO PDF (jsPDF) ──────────────────────────────────
-        function gerarRelatorioPDF() {
+        function gerarRelatorioPDF(contratoFiltro) {
             const { jsPDF } = window.jspdf;
             if (!jsPDF) { alert('Biblioteca PDF não carregada. Tente novamente.'); return; }
 
@@ -1641,7 +1646,8 @@
             doc.setTextColor(...branco);
             doc.setFontSize(16);
             doc.setFont('helvetica', 'bold');
-            doc.text('RELATÓRIO DE FATURAMENTO', margin, 12);
+            const tituloContrato = contratoFiltro === 'Ecommerce' ? 'ECOMMERCE - 40h/mes' : contratoFiltro === 'Sales Ops' ? 'SALES OPS - 60h/mes' : 'FATURAMENTO';
+            doc.text('RELATORIO DE FATURAMENTO - ' + tituloContrato, margin, 12);
             doc.setFontSize(10);
             doc.setFont('helvetica', 'normal');
             doc.text('Grupo Soluti × Gestão Online', margin, 19);
@@ -1732,14 +1738,14 @@
                     doc.setFontSize(7);
                     doc.setFont('helvetica', 'normal');
 
-                    const dt_conc = r.data_conc ? r.data_conc.split('-').reverse().join('/') : '—';
+                    const dt_conc = r.data_conc ? r.data_conc.split('-').reverse().join('/') : '-';
                     const assunto = r.assunto.length > 42 ? r.assunto.slice(0,42)+'…' : r.assunto;
                     const vals = [
                         r.chamado || r.id,
                         assunto,
                         r.projeto,
                         dt_conc,
-                        r.hrs_real ? r.hrs_real + 'h' : '—',
+                        r.hrs_real ? r.hrs_real + 'h' : '-',
                     ];
                     cx = margin;
                     vals.forEach((v, i) => {
@@ -1773,11 +1779,11 @@
                 const concSl = conc.filter(r => (r.contrato||r.projeto) === 'Sales Ops');
                 const hEc = concEc.reduce((a,r)=>a+r.hrs_real,0);
                 const hSl = concSl.reduce((a,r)=>a+r.hrs_real,0);
-                blocoContrato('E-COMMERCE — 40h/mês', verdeClaro, concEc.length, hEc, 40, concEc);
-                blocoContrato('SALES OPS — 60h/mês', verde, concSl.length, hSl, 60, concSl);
+                blocoContrato('E-COMMERCE - 40h/mês', verdeClaro, concEc.length, hEc, 40, concEc);
+                blocoContrato('SALES OPS - 60h/mês', verde, concSl.length, hSl, 60, concSl);
             } else {
                 const h = conc.reduce((a,r)=>a+r.hrs_real,0);
-                blocoContrato('CONTRATO ÚNICO — 40h/mês', verde, conc.length, h, 40, conc);
+                blocoContrato('CONTRATO ÚNICO - 40h/mês', verde, conc.length, h, 40, conc);
             }
 
             // ── FOOTER ────────────────────────────────────────────────────
@@ -1789,12 +1795,13 @@
                 doc.setTextColor(...cinza);
                 doc.setFontSize(7);
                 doc.setFont('helvetica', 'normal');
-                doc.text('© Gestão Online Soluções em TI LTDA. — Documento confidencial', margin, 293);
+                doc.text('© Gestão Online Soluções em TI LTDA. - Documento confidencial', margin, 293);
                 doc.text(`Página ${i} de ${pageCount}`, W - margin, 293, { align: 'right' });
             }
 
             // ── SALVAR ────────────────────────────────────────────────────
-            const nomeArquivo = `Faturamento_Soluti_${periodoLabel.replace(' / ','_').replace(' ','_')}.pdf`;
+            const contratoNome = contratoFiltro ? contratoFiltro.replace(' ','_') + '_' : '';
+            const nomeArquivo = 'Faturamento_Soluti_' + contratoNome + periodoLabel.replace(' / ','_').replace(' ','_') + '.pdf';
             doc.save(nomeArquivo);
         }
 
