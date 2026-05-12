@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23006837'/><text y='.9em' font-size='72' x='50%' text-anchor='middle' font-family='Arial' font-weight='bold' fill='white'>S</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soluti - Painel Executivo de Projetos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -56,6 +57,82 @@
             margin-bottom:16px;display:none;
         }
         .login-footer{text-align:center;margin-top:24px;font-size:12px;color:#98A2B3;}
+
+
+        /* ── SOLUTI UPGRADES ── */
+
+        /* Animação contagem KPI */
+        @keyframes countUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        .kpi-value { animation: countUp .5s ease forwards; }
+
+        /* Pulso Bloqueadas */
+        @keyframes pulse-red {
+            0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,.4); }
+            50% { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+        }
+        .pulse-alert { animation: pulse-red 1.8s ease-in-out infinite; }
+
+        /* Fade login -> dashboard */
+        @keyframes fadeInDash { from { opacity:0; } to { opacity:1; } }
+        .dash-fadein { animation: fadeInDash .5s ease forwards; }
+
+        /* Modal Kanban */
+        #kanban-modal-overlay {
+            display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);
+            z-index:1000;align-items:center;justify-content:center;
+        }
+        #kanban-modal-overlay.open { display:flex; }
+        #kanban-modal {
+            background:#fff;border-radius:14px;width:90%;max-width:640px;
+            max-height:88vh;overflow-y:auto;
+            box-shadow:0 20px 60px rgba(0,0,0,.25);
+            animation: countUp .25s ease;
+        }
+        .modal-header {
+            padding:20px 24px 16px;border-bottom:1px solid var(--border);
+            display:flex;justify-content:space-between;align-items:flex-start;
+            background: linear-gradient(135deg,#006837,#00A651);
+            border-radius:14px 14px 0 0;
+        }
+        .modal-title { font-size:16px;font-weight:700;color:#fff; }
+        .modal-chamado { font-size:13px;color:rgba(255,255,255,.8);margin-top:3px; }
+        .modal-close {
+            background:rgba(255,255,255,.2);border:none;border-radius:50%;
+            width:28px;height:28px;cursor:pointer;font-size:16px;color:#fff;
+            display:flex;align-items:center;justify-content:center;flex-shrink:0;
+        }
+        .modal-close:hover { background:rgba(255,255,255,.35); }
+        .modal-body { padding:20px 24px; }
+        .modal-row { display:flex;gap:24px;margin-bottom:16px; }
+        .modal-field { flex:1; }
+        .modal-label { font-size:11px;font-weight:600;color:var(--text4);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px; }
+        .modal-value { font-size:13px;color:var(--text2);font-weight:500; }
+        .modal-desc { background:var(--bg);border-radius:8px;padding:14px;font-size:13px;color:var(--text2);line-height:1.6;margin-top:4px; }
+        .modal-status-badge { display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600; }
+
+        /* Login Soluti style */
+        #login-overlay {
+            background: linear-gradient(135deg, #004d27 0%, #006837 50%, #00A651 100%) !important;
+        }
+        .login-card {
+            border-top: none !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,.3) !important;
+        }
+        .login-logo-mark {
+            background: linear-gradient(135deg,#006837,#00A651) !important;
+        }
+        .login-btn {
+            background: #006837 !important;
+        }
+        .login-btn:hover { background: #004d27 !important; }
+        .login-field input:focus { border-color: #006837 !important; box-shadow: 0 0 0 3px rgba(0,104,55,.15) !important; }
+
+        /* Saudação no header */
+        #header-greeting {
+            font-size:13px;color:var(--text3);margin-left:auto;margin-right:12px;
+            display:flex;align-items:center;gap:6px;
+        }
+        #header-greeting strong { color:var(--text2); }
 
         /* ── RESET ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -388,7 +465,7 @@
                 <p>Gestão estratégica de demandas e entregas - Gestão Online</p>
             </div>
             <div class="header-right">
-                <button onclick="doLogout()" style="background:none;border:1px solid #D0D5DD;border-radius:8px;padding:8px 14px;font-size:12px;color:#667085;cursor:pointer;margin-right:8px;font-family:inherit">Sair</button>
+                <span id="header-greeting" style="font-size:13px;color:#667085;margin-right:4px"></span><button onclick="doLogout()" style="background:none;border:1px solid #D0D5DD;border-radius:8px;padding:8px 14px;font-size:12px;color:#667085;cursor:pointer;margin-right:8px;font-family:inherit">Sair</button>
             <button class="btn-refresh" onclick="forceRefresh()">
                     <span class="refresh-icon">🔄</span>
                     <span>Sincronizar</span>
@@ -794,6 +871,65 @@
 
     </div>
 
+
+<!-- ── MODAL KANBAN ── -->
+<div id="kanban-modal-overlay" onclick="closeKanbanModal(event)">
+    <div id="kanban-modal">
+        <div class="modal-header">
+            <div>
+                <div class="modal-chamado" id="modal-chamado">#0000</div>
+                <div class="modal-title" id="modal-titulo">Carregando...</div>
+            </div>
+            <button class="modal-close" onclick="fecharModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-row">
+                <div class="modal-field">
+                    <div class="modal-label">Status</div>
+                    <div class="modal-value" id="modal-status">-</div>
+                </div>
+                <div class="modal-field">
+                    <div class="modal-label">Projeto</div>
+                    <div class="modal-value" id="modal-projeto">-</div>
+                </div>
+                <div class="modal-field">
+                    <div class="modal-label">Contrato</div>
+                    <div class="modal-value" id="modal-contrato">-</div>
+                </div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <div class="modal-label">Data do Ticket</div>
+                    <div class="modal-value" id="modal-data">-</div>
+                </div>
+                <div class="modal-field">
+                    <div class="modal-label">Data Conclusão</div>
+                    <div class="modal-value" id="modal-data-conc">-</div>
+                </div>
+                <div class="modal-field">
+                    <div class="modal-label">Equipe GO</div>
+                    <div class="modal-value" id="modal-equipe">-</div>
+                </div>
+            </div>
+            <div class="modal-row">
+                <div class="modal-field">
+                    <div class="modal-label">Horas Estimadas</div>
+                    <div class="modal-value" id="modal-hrs-est">-</div>
+                </div>
+                <div class="modal-field">
+                    <div class="modal-label">Horas Reais</div>
+                    <div class="modal-value" id="modal-hrs-real">-</div>
+                </div>
+                <div class="modal-field"></div>
+            </div>
+            <div class="modal-field" id="modal-resumo-wrap" style="display:none">
+                <div class="modal-label">Resumo do Chamado</div>
+                <div class="modal-desc" id="modal-resumo"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="footer">
         © Gestão Online Soluções em TI LTDA. Todos os direitos reservados.
     </div>
@@ -1004,6 +1140,21 @@
         }
 
         // ── KPIs ──────────────────────────────────────────────────────────
+        function animateCount(el, target) {
+            if (!el) return;
+            const start = 0;
+            const duration = 600;
+            const startTime = performance.now();
+            function step(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const val = Math.floor(progress * target);
+                el.textContent = val;
+                if (progress < 1) requestAnimationFrame(step);
+                else el.textContent = target;
+            }
+            requestAnimationFrame(step);
+        }
+
         function updateKPIs(f) {
             const q = (cls) => document.querySelector('.kpi-card.' + cls + ' .kpi-value');
             if (q('info'))    q('info').textContent    = f.length;
@@ -1026,7 +1177,7 @@
                     col.innerHTML += `<div style="color:#94A3B8;font-size:11px;text-align:center;padding:20px 0">—</div>`;
                 } else {
                     items.slice(0, 8).forEach(r => {
-                        col.innerHTML += `<div class="card">
+                        col.innerHTML += `<div class="card" onclick="abrirModal('${r.id}')" style="cursor:pointer" title="Ver detalhes">
                             <div class="card-id">${r.chamado || r.id}</div>
                             <div class="card-project">${r.projeto}</div>
                             <div class="card-title">${r.assunto.slice(0,55)}${r.assunto.length>55?'…':''}</div>
@@ -1321,12 +1472,12 @@
                 btn.textContent = '';
                 btn.innerHTML = '<span class="spinner"></span>Carregando...';
                 btn.disabled = true;
+                sessionStorage.setItem('go_auth_user', email);
                 setTimeout(() => {
                     document.getElementById('login-overlay').style.display = 'none';
-                    const dash = document.getElementById('dashboard-screen');
-                    dash.style.display = 'block';
-                    dash.classList.add('fade-in');
+                    showDashboardWithFade();
                     sessionStorage.setItem('go_auth', '1');
+                    setGreeting(email);
                     resetTimer();
                 }, 900);
             } else {
@@ -1371,11 +1522,82 @@
         // Verificar sessão ao abrir
         if (sessionStorage.getItem('go_auth') === '1') {
             document.getElementById('login-overlay').style.display = 'none';
-            const dash = document.getElementById('dashboard-screen');
-            dash.style.display = 'block';
+            showDashboardWithFade();
+            const savedUser = sessionStorage.getItem('go_auth_user');
+            if (savedUser) setGreeting(savedUser);
             resetTimer();
         }
     </script>
+
+
+        // ── MODAL KANBAN ─────────────────────────────────────────────────
+        function abrirModal(id) {
+            const r = ALL_RECORDS.find(x => x.id === id);
+            if (!r) return;
+
+            const STATUS_COLORS = {
+                'Concluída':          '#027A48',
+                'Execução':           '#7C3AED',
+                'Bloqueada':          '#B42318',
+                'Backlog':            '#344054',
+                'Análise Técnica':    '#1D4ED8',
+                'Ag. Aprovação Soluti': '#92400E',
+            };
+            const color = STATUS_COLORS[r.status] || '#344054';
+
+            document.getElementById('modal-chamado').textContent = r.chamado ? '#' + r.chamado.replace('#','') : r.id;
+            document.getElementById('modal-titulo').textContent  = r.assunto;
+            document.getElementById('modal-status').innerHTML    = `<span class="modal-status-badge" style="background:${color}15;color:${color}">${r.status}</span>`;
+            document.getElementById('modal-projeto').textContent = r.projeto || '—';
+            document.getElementById('modal-contrato').textContent = r.contrato || '—';
+            document.getElementById('modal-equipe').textContent  = r.equipe || '—';
+            document.getElementById('modal-data').textContent    = r.data ? r.data.split('-').reverse().join('/') : '—';
+            document.getElementById('modal-data-conc').innerHTML = r.data_conc
+                ? `<span style="color:#027A48;font-weight:600">${r.data_conc.split('-').reverse().join('/')}</span>`
+                : '<span style="color:#94A3B8">Não preenchida</span>';
+            document.getElementById('modal-hrs-est').textContent  = r.hrs_est  ? r.hrs_est  + 'h' : '—';
+            document.getElementById('modal-hrs-real').textContent = r.hrs_real ? r.hrs_real + 'h' : '—';
+
+            // Resumo — mostra se tiver conteúdo extra
+            const resumoWrap = document.getElementById('modal-resumo-wrap');
+            const resumoEl   = document.getElementById('modal-resumo');
+            resumoWrap.style.display = 'none'; // sem resumo por enquanto
+
+            document.getElementById('kanban-modal-overlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModal() {
+            document.getElementById('kanban-modal-overlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function closeKanbanModal(e) {
+            if (e.target.id === 'kanban-modal-overlay') fecharModal();
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') fecharModal();
+        });
+
+        // ── SAUDAÇÃO PERSONALIZADA ────────────────────────────────────────
+        function setGreeting(email) {
+            const el = document.getElementById('header-greeting');
+            if (!el || !email) return;
+            const nome = email.split('@')[0].split('.')[0];
+            const capitalizado = nome.charAt(0).toUpperCase() + nome.slice(1);
+            el.innerHTML = `Olá, <strong>${capitalizado}</strong> 👋`;
+        }
+
+        // ── FADE LOGIN -> DASHBOARD ───────────────────────────────────────
+        // Já temos o delay — só garante a classe fade
+        function showDashboardWithFade() {
+            const dash = document.getElementById('dashboard-screen');
+            if (dash) {
+                dash.style.display = 'block';
+                dash.classList.add('dash-fadein');
+            }
+        }
 
 </body>
 </html>
