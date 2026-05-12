@@ -5,6 +5,7 @@
     <link rel="icon" type="image/png" href="https://www.soluti.com.br/wp-content/uploads/2022/12/cropped-favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soluti - Painel Executivo de Projetos</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
 
@@ -765,7 +766,12 @@
 
         <!-- FATURAMENTO -->
         <div id="faturamento" class="tab-content">
-            <div class="section-title">Faturamento</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <div class="section-title" style="margin-bottom:0">Faturamento</div>
+                <button id="btn-pdf-go" onclick="gerarRelatorioPDF()" style="display:none;background:#006837;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;gap:6px;align-items:center" title="Apenas equipe Gestão Online">
+                    📄 Gerar Relatório PDF
+                </button>
+            </div>
 
             <!-- REGIME ANTIGO: antes de Out/2025 -->
             <div id="fat-regime-antigo" style="display:none">
@@ -1542,6 +1548,9 @@
                     document.getElementById('login-overlay').style.display = 'none';
                     showDashboardWithFade();
                     sessionStorage.setItem('go_auth', '1');
+                    const isGO = user.includes('@gestao-online.com');
+                    sessionStorage.setItem('go_perfil', isGO ? 'go' : 'cliente');
+                    togglePerfilGO(isGO);
                     setGreeting(user);
                     resetTimer();
                 }, 900);
@@ -1590,6 +1599,8 @@
             showDashboardWithFade();
             const savedUser = sessionStorage.getItem('go_auth_user');
             if (savedUser) setGreeting(savedUser);
+            const perfil = sessionStorage.getItem('go_perfil');
+            togglePerfilGO(perfil === 'go');
             resetTimer();
         }
     </script>
@@ -1607,6 +1618,7 @@
                 _tt.innerHTML = `
                     <div class="card-tooltip-row"><div class="card-tooltip-label">Chamado</div><div class="card-tooltip-val">${r.chamado || r.id}</div></div>
                     <div class="card-tooltip-row"><div class="card-tooltip-label">Assunto</div><div class="card-tooltip-val">${r.assunto}</div></div>
+                    ${r.resumo ? `<div class="card-tooltip-row"><div class="card-tooltip-label">Resumo</div><div class="card-tooltip-val" style="max-width:260px;white-space:normal;font-size:11px;opacity:.9">${r.resumo.slice(0,120)}${r.resumo.length>120?'…':''}</div></div>` : ''}
                     <div class="card-tooltip-row"><div class="card-tooltip-label">Projeto</div><div class="card-tooltip-val">${r.projeto} ${r.contrato ? '· '+r.contrato : ''}</div></div>
                     ${r.equipe ? `<div class="card-tooltip-row"><div class="card-tooltip-label">Equipe</div><div class="card-tooltip-val">${r.equipe}</div></div>` : ''}
                     ${r.hrs_est ? `<div class="card-tooltip-row"><div class="card-tooltip-label">Horas Est.</div><div class="card-tooltip-val">${r.hrs_est}h</div></div>` : ''}
@@ -1705,9 +1717,205 @@
                 setTimeout(() => {
                     setNow('Gestão Online');
                     applyFilters();
+                    // Auto-sync ao abrir — sempre busca dados frescos
+                    setTimeout(() => forceRefresh(), 800);
                 }, 50);
             }
         }
+    
+        // ── PERFIL GO vs CLIENTE ─────────────────────────────────────────
+        function togglePerfilGO(isGO) {
+            const btnPDF = document.getElementById('btn-pdf-go');
+            if (btnPDF) {
+                btnPDF.style.display = isGO ? 'flex' : 'none';
+            }
+        }
+
+        // ── GERAR RELATÓRIO PDF (jsPDF) ──────────────────────────────────
+        function gerarRelatorioPDF() {
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) { alert('Biblioteca PDF não carregada. Tente novamente.'); return; }
+
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const W = 210, margin = 15;
+            let y = margin;
+
+            // Cores
+            const verde = [0, 104, 55];
+            const verdeClaro = [0, 166, 81];
+            const cinza = [100, 112, 130];
+            const cinzaClaro = [244, 246, 248];
+            const branco = [255, 255, 255];
+            const preto = [16, 24, 40];
+
+            const meses = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+            const mesSel = document.getElementById('f-mes') ? document.getElementById('f-mes').value : 'all';
+            const anoSel = document.getElementById('f-ano') ? document.getElementById('f-ano').value : '2026';
+            const periodoLabel = mesSel !== 'all' ? `${meses[parseInt(mesSel)]} / ${anoSel}` : `Ano ${anoSel}`;
+
+            // ── HEADER ────────────────────────────────────────────────────
+            doc.setFillColor(...verde);
+            doc.rect(0, 0, W, 28, 'F');
+            doc.setTextColor(...branco);
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+            doc.text('RELATÓRIO DE FATURAMENTO', margin, 12);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Grupo Soluti × Gestão Online', margin, 19);
+            doc.text(`Período: ${periodoLabel}`, margin, 25);
+
+            // Data geração
+            const agora = new Date();
+            const dataGeracao = `Gerado em: ${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}`;
+            doc.setFontSize(8);
+            doc.text(dataGeracao, W - margin, 25, { align: 'right' });
+
+            y = 36;
+
+            // ── FUNÇÃO: bloco de contrato ─────────────────────────────────
+            function blocoContrato(titulo, cor, demandas, horas, limite, chamados) {
+                if (y > 250) { doc.addPage(); y = margin; }
+
+                // Header do bloco
+                doc.setFillColor(...cor);
+                doc.rect(margin, y, W - margin*2, 10, 'F');
+                doc.setTextColor(...branco);
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.text(titulo, margin + 4, y + 7);
+                y += 12;
+
+                // Cards de resumo
+                const cardW = (W - margin*2 - 6) / 3;
+                const cards = [
+                    { label: 'Demandas', val: String(demandas) },
+                    { label: 'Horas Utilizadas', val: horas.toFixed(1) + 'h' },
+                    { label: horas > limite ? '⚠ Excedente' : 'Horas Restantes',
+                      val: horas > limite ? `+${(horas-limite).toFixed(1)}h` : `${(limite-horas).toFixed(1)}h` },
+                ];
+                cards.forEach((c, i) => {
+                    const cx = margin + i * (cardW + 3);
+                    doc.setFillColor(...cinzaClaro);
+                    doc.roundedRect(cx, y, cardW, 16, 2, 2, 'F');
+                    doc.setTextColor(...cinza);
+                    doc.setFontSize(7);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(c.label.toUpperCase(), cx + 4, y + 5);
+                    doc.setTextColor(horas > limite && i===2 ? 220 : preto[0], horas > limite && i===2 ? 38 : preto[1], horas > limite && i===2 ? 38 : preto[2]);
+                    doc.setFontSize(13);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(c.val, cx + 4, y + 13);
+                });
+                y += 20;
+
+                // Tabela de chamados
+                if (chamados.length === 0) {
+                    doc.setTextColor(...cinza);
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'italic');
+                    doc.text('Nenhum chamado concluído neste período.', margin + 4, y + 6);
+                    y += 12;
+                    return;
+                }
+
+                // Header tabela
+                const cols = [
+                    { label: 'Chamado', w: 22 },
+                    { label: 'Assunto', w: 80 },
+                    { label: 'Projeto', w: 30 },
+                    { label: 'Dt. Conclusão', w: 25 },
+                    { label: 'Hrs Fat.', w: 18 },
+                ];
+                const tableW = cols.reduce((a,c)=>a+c.w, 0);
+                doc.setFillColor(50,50,60);
+                doc.rect(margin, y, tableW, 7, 'F');
+                doc.setTextColor(...branco);
+                doc.setFontSize(7.5);
+                doc.setFont('helvetica', 'bold');
+                let cx = margin;
+                cols.forEach(c => {
+                    doc.text(c.label, cx + 2, y + 5);
+                    cx += c.w;
+                });
+                y += 7;
+
+                // Linhas
+                chamados.forEach((r, ri) => {
+                    if (y > 270) { doc.addPage(); y = margin; }
+                    const bg = ri % 2 === 0 ? branco : cinzaClaro;
+                    doc.setFillColor(...bg);
+                    doc.rect(margin, y, tableW, 7, 'F');
+                    doc.setTextColor(...preto);
+                    doc.setFontSize(7);
+                    doc.setFont('helvetica', 'normal');
+
+                    const dt_conc = r.data_conc ? r.data_conc.split('-').reverse().join('/') : '—';
+                    const assunto = r.assunto.length > 42 ? r.assunto.slice(0,42)+'…' : r.assunto;
+                    const vals = [
+                        r.chamado || r.id,
+                        assunto,
+                        r.projeto,
+                        dt_conc,
+                        r.hrs_real ? r.hrs_real + 'h' : '—',
+                    ];
+                    cx = margin;
+                    vals.forEach((v, i) => {
+                        doc.text(String(v), cx + 2, y + 5);
+                        cx += cols[i].w;
+                    });
+
+                    // Linha separadora
+                    doc.setDrawColor(220,220,220);
+                    doc.line(margin, y + 7, margin + tableW, y + 7);
+                    y += 7;
+                });
+                y += 8;
+            }
+
+            // ── BUSCAR DADOS DO FATURAMENTO ───────────────────────────────
+            const novo = isRegimeNovo();
+            const conc = ALL_RECORDS.filter(r => {
+                if (r.status !== 'Concluída') return false;
+                if (!r.data_conc) return false;
+                const dc = new Date(r.data_conc);
+                const proj = document.getElementById('f-proj')?.value || 'all';
+                if (proj !== 'all' && r.projeto !== proj) return false;
+                if (anoSel !== 'all' && dc.getFullYear() != anoSel) return false;
+                if (mesSel !== 'all' && (dc.getMonth()+1) != mesSel) return false;
+                return true;
+            });
+
+            if (novo) {
+                const concEc = conc.filter(r => (r.contrato||r.projeto) === 'Ecommerce');
+                const concSl = conc.filter(r => (r.contrato||r.projeto) === 'Sales Ops');
+                const hEc = concEc.reduce((a,r)=>a+r.hrs_real,0);
+                const hSl = concSl.reduce((a,r)=>a+r.hrs_real,0);
+                blocoContrato('E-COMMERCE — 40h/mês', verdeClaro, concEc.length, hEc, 40, concEc);
+                blocoContrato('SALES OPS — 60h/mês', verde, concSl.length, hSl, 60, concSl);
+            } else {
+                const h = conc.reduce((a,r)=>a+r.hrs_real,0);
+                blocoContrato('CONTRATO ÚNICO — 40h/mês', verde, conc.length, h, 40, conc);
+            }
+
+            // ── FOOTER ────────────────────────────────────────────────────
+            const pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFillColor(...cinzaClaro);
+                doc.rect(0, 287, W, 10, 'F');
+                doc.setTextColor(...cinza);
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'normal');
+                doc.text('© Gestão Online Soluções em TI LTDA. — Documento confidencial', margin, 293);
+                doc.text(`Página ${i} de ${pageCount}`, W - margin, 293, { align: 'right' });
+            }
+
+            // ── SALVAR ────────────────────────────────────────────────────
+            const nomeArquivo = `Faturamento_Soluti_${periodoLabel.replace(' / ','_').replace(' ','_')}.pdf`;
+            doc.save(nomeArquivo);
+        }
+
     </script>
 
 </body>
