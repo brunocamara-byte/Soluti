@@ -134,6 +134,25 @@
         }
         #header-greeting strong { color:var(--text2); }
 
+
+        /* ── TOOLTIP KANBAN ── */
+        .card-tooltip {
+            position:absolute;z-index:500;
+            background:#1e293b;color:#f1f5f9;
+            font-size:12px;line-height:1.5;
+            padding:10px 14px;border-radius:8px;
+            max-width:280px;width:max-content;
+            box-shadow:0 8px 24px rgba(0,0,0,.25);
+            pointer-events:none;opacity:0;
+            transition:opacity .15s ease;
+            top:0;left:0;
+        }
+        .card-tooltip.visible { opacity:1; }
+        .card-tooltip-row { margin-bottom:4px; }
+        .card-tooltip-label { color:#94a3b8;font-size:10px;text-transform:uppercase;letter-spacing:.5px; }
+        .card-tooltip-val { color:#f1f5f9;font-weight:500; }
+        .kanban-column { position:relative; }
+
         /* ── RESET ── */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -308,16 +327,31 @@
             gap: 14px; padding: 20px;
         }
         .kanban-column {
-            background: var(--bg); border-radius: 8px; padding: 14px;
-            border: 1px solid var(--border); border-top: 3px solid var(--green);
-            min-height: 280px;
+            background: #F8F9FA; border-radius: 10px; padding: 14px;
+            border: 1px solid #E4E7EC;
+            min-height: 280px; transition: box-shadow .2s;
         }
-        .kanban-column.analise-tec  { border-top-color: var(--blue); }
-        .kanban-column.ag-aprovacao { border-top-color: var(--yellow); }
-        .kanban-column.execucao     { border-top-color: #7C3AED; }
-        .kanban-column.bloqueada    { border-top-color: var(--red); }
-        .kanban-column.concluida    { border-top-color: var(--green); }
+        /* Colunas neutras — não precisam de ação */
+        .kanban-column.backlog      { border-top: 3px solid #9CA3AF; }
+        .kanban-column.analise-tec  { border-top: 3px solid #9CA3AF; }
+        .kanban-column.ag-aprovacao { border-top: 3px solid #9CA3AF; }
+        .kanban-column.concluida    { border-top: 3px solid #9CA3AF; }
+        /* Colunas de ação — chamam atenção */
+        .kanban-column.execucao {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-top: 3px solid #2563EB;
+            box-shadow: 0 2px 8px rgba(37,99,235,.12);
+        }
+        .kanban-column.bloqueada {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-top: 3px solid #DC2626;
+            box-shadow: 0 2px 8px rgba(220,38,38,.12);
+        }
 
+        .kanban-column.execucao h3  { color: #1D4ED8; }
+        .kanban-column.bloqueada h3 { color: #B91C1C; }
         .kanban-column h3 {
             font-size: 11px; font-weight: 700; color: var(--text2);
             text-transform: uppercase; letter-spacing: .06em;
@@ -465,7 +499,7 @@
                 <p>Gestão estratégica de demandas e entregas - Gestão Online</p>
             </div>
             <div class="header-right">
-                <span id="header-greeting" style="font-size:13px;color:#667085;margin-right:4px"></span><button onclick="doLogout()" style="background:none;border:1px solid #D0D5DD;border-radius:8px;padding:8px 14px;font-size:12px;color:#667085;cursor:pointer;margin-right:8px;font-family:inherit">Sair</button>
+                <span id="header-greeting" style="font-size:13px;color:#344054;margin-right:8px;font-weight:500"></span><button onclick="doLogout()" style="background:none;border:1px solid #D0D5DD;border-radius:8px;padding:8px 14px;font-size:12px;color:#667085;cursor:pointer;margin-right:8px;font-family:inherit">Sair</button>
             <button class="btn-refresh" onclick="forceRefresh()">
                     <span class="refresh-icon">🔄</span>
                     <span>Sincronizar</span>
@@ -873,6 +907,10 @@
 
 
 <!-- ── MODAL KANBAN ── -->
+
+<!-- ── TOOLTIP KANBAN ── -->
+<div id="card-tooltip" class="card-tooltip"></div>
+
 <div id="kanban-modal-overlay" onclick="closeKanbanModal(event)">
     <div id="kanban-modal">
         <div class="modal-header">
@@ -1191,7 +1229,7 @@
                     col.innerHTML += `<div style="color:#94A3B8;font-size:11px;text-align:center;padding:20px 0">—</div>`;
                 } else {
                     items.slice(0, 8).forEach(r => {
-                        col.innerHTML += `<div class="card" onclick="abrirModal('${r.id}')" style="cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        col.innerHTML += `<div class="card" onclick="abrirModal('${r.id}')" onmouseenter="showTooltip(event,'${r.id}')" onmouseleave="hideTooltip()" style="cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 12px rgba(0,0,0,.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
                             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
                                 <div class="card-id">${r.chamado || r.id}</div>
                                 ${r.equipe ? `<div style="font-size:9px;color:#6b7280;background:#f3f4f6;border-radius:4px;padding:1px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px">${r.equipe.split(' ')[0]}</div>` : ''}
@@ -1546,7 +1584,41 @@
             resetTimer();
         }
     </script>
+    <script>
+// ── TOOLTIP KANBAN ─────────────────────────────────────────────
+        const _tt = document.getElementById('card-tooltip');
+        let _ttTimer = null;
 
+        function showTooltip(e, id) {
+            const r = ALL_RECORDS.find(x => x.id === id);
+            if (!r) return;
+            clearTimeout(_ttTimer);
+            _ttTimer = setTimeout(() => {
+                const dt = r.data ? r.data.split('-').reverse().join('/') : '—';
+                _tt.innerHTML = `
+                    <div class="card-tooltip-row"><div class="card-tooltip-label">Chamado</div><div class="card-tooltip-val">${r.chamado || r.id}</div></div>
+                    <div class="card-tooltip-row"><div class="card-tooltip-label">Assunto</div><div class="card-tooltip-val">${r.assunto}</div></div>
+                    <div class="card-tooltip-row"><div class="card-tooltip-label">Projeto</div><div class="card-tooltip-val">${r.projeto} ${r.contrato ? '· '+r.contrato : ''}</div></div>
+                    ${r.equipe ? `<div class="card-tooltip-row"><div class="card-tooltip-label">Equipe</div><div class="card-tooltip-val">${r.equipe}</div></div>` : ''}
+                    ${r.hrs_est ? `<div class="card-tooltip-row"><div class="card-tooltip-label">Horas Est.</div><div class="card-tooltip-val">${r.hrs_est}h</div></div>` : ''}
+                    <div class="card-tooltip-row"><div class="card-tooltip-label">Data</div><div class="card-tooltip-val">${dt}</div></div>
+                `;
+                // Posicionar tooltip
+                const rect = e.currentTarget.getBoundingClientRect();
+                const ttW = 280;
+                let left = rect.right + 10;
+                if (left + ttW > window.innerWidth) left = rect.left - ttW - 10;
+                _tt.style.left = left + 'px';
+                _tt.style.top  = Math.min(rect.top, window.innerHeight - 200) + 'px';
+                _tt.style.position = 'fixed';
+                _tt.classList.add('visible');
+            }, 350);
+        }
+
+        function hideTooltip() {
+            clearTimeout(_ttTimer);
+            _tt.classList.remove('visible');
+        }
 
         // ── MODAL KANBAN ─────────────────────────────────────────────────
         function abrirModal(id) {
@@ -1625,6 +1697,7 @@
                 }, 50);
             }
         }
+    </script>
 
 </body>
 </html>
