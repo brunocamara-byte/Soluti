@@ -1671,14 +1671,20 @@
             document.getElementById('modal-hrs-est').textContent  = r.hrs_est  ? r.hrs_est  + 'h' : '—';
             document.getElementById('modal-hrs-real').textContent = r.hrs_real ? r.hrs_real + 'h' : '—';
 
-            // Resumo — mostra se tiver conteúdo
+            // Resumo — sempre visível, com placeholder se vazio
             const resumoWrap = document.getElementById('modal-resumo-wrap');
             const resumoEl   = document.getElementById('modal-resumo');
-            if (r.resumo && r.resumo.length > 0) {
-                resumoEl.textContent = r.resumo;
-                resumoWrap.style.display = 'block';
-            } else {
-                resumoWrap.style.display = 'none';
+            if (resumoWrap) resumoWrap.style.display = 'block';
+            if (resumoEl) {
+                if (r.resumo && r.resumo.length > 0) {
+                    resumoEl.style.color = 'var(--text2)';
+                    resumoEl.style.fontStyle = 'normal';
+                    resumoEl.textContent = r.resumo;
+                } else {
+                    resumoEl.style.color = '#94A3B8';
+                    resumoEl.style.fontStyle = 'italic';
+                    resumoEl.textContent = 'Resumo não preenchido. Adicione na coluna L da planilha.';
+                }
             }
 
             document.getElementById('kanban-modal-overlay').classList.add('open');
