@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%23006837'/><text y='.9em' font-size='72' x='50%' text-anchor='middle' font-family='Arial' font-weight='bold' fill='white'>S</text></svg>">
+    <link rel="icon" type="image/png" href="https://www.soluti.com.br/wp-content/uploads/2022/12/cropped-favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Soluti - Painel Executivo de Projetos</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
@@ -986,10 +986,11 @@
                 const hrs_est  = parseFloat(cols[8]) || 0;  // col I
                 const hrs_real = parseFloat(cols[9]) || 0;  // col J
                 const data_conc = parseDate(cols[10]);       // col K
+                const resumo    = (cols[11] || '').trim();        // col L
 
                 if (!chamado && !assunto) continue; // pula linhas completamente vazias
 
-                records.push({ id, chamado, assunto, data, status, equipe, projeto, contrato, hrs_est, hrs_real, data_conc });
+                records.push({ id, chamado, assunto, data, status, equipe, projeto, contrato, hrs_est, hrs_real, data_conc, resumo });
             }
             return records;
         }
@@ -1421,8 +1422,9 @@
     <div id="login-overlay">
         <div class="login-card">
             <div style="text-align:center;margin-bottom:32px">
-                <div class="login-logo-mark">GO</div>
-                <div class="login-title">Soluti - Painel Executivo</div>
+                <img src="https://www.soluti.com.br/wp-content/uploads/2025/07/logo-totem-soluti.png" 
+     alt="Soluti" style="height:56px;width:auto;margin-bottom:16px;object-fit:contain">
+                <div class="login-title">Painel Executivo de Projetos</div>
                 <div class="login-sub">Gestão Online - Acesso restrito</div>
             </div>
             <div class="login-error" id="login-error">Usuário ou senha incorretos.</div>
@@ -1558,10 +1560,15 @@
             document.getElementById('modal-hrs-est').textContent  = r.hrs_est  ? r.hrs_est  + 'h' : '—';
             document.getElementById('modal-hrs-real').textContent = r.hrs_real ? r.hrs_real + 'h' : '—';
 
-            // Resumo — mostra se tiver conteúdo extra
+            // Resumo — mostra se tiver conteúdo
             const resumoWrap = document.getElementById('modal-resumo-wrap');
             const resumoEl   = document.getElementById('modal-resumo');
-            resumoWrap.style.display = 'none'; // sem resumo por enquanto
+            if (r.resumo && r.resumo.length > 0) {
+                resumoEl.textContent = r.resumo;
+                resumoWrap.style.display = 'block';
+            } else {
+                resumoWrap.style.display = 'none';
+            }
 
             document.getElementById('kanban-modal-overlay').classList.add('open');
             document.body.style.overflow = 'hidden';
@@ -1596,6 +1603,8 @@
             if (dash) {
                 dash.style.display = 'block';
                 dash.classList.add('dash-fadein');
+                setNow('Gestão Online');
+                applyFilters();
             }
         }
 
