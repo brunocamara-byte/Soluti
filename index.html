@@ -1474,12 +1474,12 @@
                 btn.textContent = '';
                 btn.innerHTML = '<span class="spinner"></span>Carregando...';
                 btn.disabled = true;
-                sessionStorage.setItem('go_auth_user', email);
+                sessionStorage.setItem('go_auth_user', user);
                 setTimeout(() => {
                     document.getElementById('login-overlay').style.display = 'none';
                     showDashboardWithFade();
                     sessionStorage.setItem('go_auth', '1');
-                    setGreeting(email);
+                    setGreeting(user);
                     resetTimer();
                 }, 900);
             } else {
